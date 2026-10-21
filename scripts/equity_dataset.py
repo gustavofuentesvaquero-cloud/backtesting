@@ -15,7 +15,7 @@ import duckdb
 import numpy as np
 import pandas as pd
 
-from scripts.data_baseline import inspect_bars
+from scripts.data_baseline import inspect_bars, validate_freeze_locations
 from market_catalog.storage import ensure_mutable_data_path
 from market_catalog.historical_quality import assess_daily_bars, validate_daily_bars
 from market_catalog.corporate_actions import EquityActionPolicy, INITIAL_EQUITY_POLICY
@@ -174,10 +174,7 @@ def read_downloads(source: Path) -> tuple[dict, dict]:
 
 
 def freeze(source: Path, target: Path, catalog_path: Path = ROOT / "data" / "gold_miners_stocks.json") -> dict:
-    if target.exists():
-        raise ValueError(f"Refusing to overwrite frozen dataset: {target}")
-    if target.resolve().is_relative_to(source.resolve()) or source.resolve().is_relative_to(target.resolve()):
-        raise ValueError("Downloads and frozen datasets must have separate, non-overlapping directories")
+    validate_freeze_locations(source, target)
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
     validate_catalog(catalog)
     frames, receipts = read_downloads(source)

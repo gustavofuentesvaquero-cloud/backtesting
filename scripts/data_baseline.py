@@ -68,11 +68,22 @@ def verify_baseline(target: Path = DEFAULT_TARGET) -> dict:
     return manifest
 
 
-def create_baseline(source: Path, target: Path, symbols=SYMBOLS) -> dict:
-    if target.exists():
+def validate_freeze_locations(source: Path, target: Path) -> None:
+    """A new accepted dataset must be outside writable caches and older datasets."""
+    if target.exists() or target.is_symlink():
         raise ValueError(f"Refusing to overwrite existing baseline directory: {target}")
     if target.resolve().is_relative_to(source.resolve()) or source.resolve().is_relative_to(target.resolve()):
         raise ValueError("Downloads and frozen datasets must have separate, non-overlapping directories")
+    path = target.resolve()
+    operational = (ROOT / "data" / "historical", ROOT / "artifacts" / "downloads")
+    if any(path.is_relative_to(parent.resolve()) for parent in operational):
+        raise ValueError("Frozen dataset destination cannot be inside an operational download/cache directory")
+    if any((parent / "manifest.json").is_file() for parent in path.parents):
+        raise ValueError("Cannot nest a new dataset inside an existing frozen dataset")
+
+
+def create_baseline(source: Path, target: Path, symbols=SYMBOLS) -> dict:
+    validate_freeze_locations(source, target)
     # Inspect every input before copying, and do not infer provider or adjustment metadata.
     files = {f"{symbol}_1d.parquet": inspect_bars(source / f"{symbol}_1d.parquet", symbol) for symbol in symbols}
     manifest = {

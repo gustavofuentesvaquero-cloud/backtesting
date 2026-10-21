@@ -3,6 +3,7 @@
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from market_catalog import MarketDataStore
 from scripts.data_baseline import create_baseline, verify_baseline
@@ -49,3 +50,34 @@ class FrozenStorageTests(unittest.TestCase):
                 freeze(source, source / "frozen")
             with self.assertRaisesRegex(ValueError, "non-overlapping"):
                 create_baseline(source, source / "legacy-frozen", symbols=("TEST",))
+
+    def test_neither_creator_can_nest_another_dataset_in_an_accepted_one(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "downloads"
+            source.mkdir()
+            accepted = root / "accepted"
+            accepted.mkdir()
+            manifest = accepted / "manifest.json"
+            manifest.write_text('{"purpose":"frozen test"}')
+            original = manifest.read_bytes()
+            target = accepted / "new-version"
+            for creator in (freeze, create_baseline):
+                with self.subTest(creator=creator.__name__), self.assertRaisesRegex(ValueError, "existing frozen"):
+                    creator(source, target)
+                self.assertFalse(target.exists())
+                self.assertEqual(manifest.read_bytes(), original)
+
+    def test_neither_creator_can_put_a_frozen_dataset_inside_operational_roots(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "source"
+            source.mkdir()
+            # Patch only the configured project root; all scenario paths stay temporary.
+            with patch("scripts.data_baseline.ROOT", root):
+                for parent in (root / "data" / "historical", root / "artifacts" / "downloads"):
+                    target = parent / "accepted"
+                    for creator in (freeze, create_baseline):
+                        with self.subTest(parent=parent, creator=creator.__name__), self.assertRaisesRegex(ValueError, "operational"):
+                            creator(source, target)
+                        self.assertFalse(target.exists())
