@@ -60,6 +60,7 @@ python -m scripts.check --suite unit
 python -m scripts.data_baseline
 python -m scripts.equity_dataset
 python -m scripts.equity_dataset --check-metadata data/metadata/nyse-equities-2024-v1.json
+python -m scripts.equity_dataset --check-actions config/equity-corporate-actions.json
 python -m scripts.equity_dataset --quality-report artifacts/daily-quality.json
 python -m scripts.check --suite historical
 python -m scripts.check --suite all --report artifacts/preparation/checks.json
@@ -132,3 +133,9 @@ Este comando **reescribe** `data/diario_trading_oro.xlsx`. Para descargar cotiza
 - [Grabación y replay](docs/phase7-recording-replay.md)
 - [Calidad y rendimiento](docs/phase8-quality-performance.md)
 - [Observabilidad y despliegue](docs/phase9-observability-deployment.md)
+
+## Datos y acciones corporativas
+
+La [política de splits y dividendos](docs/acciones-corporativas.md) fija rendimiento de precios para BE/NEM: no se añaden dividendos ni splits sobre precios ya ajustados. Los motores y el ledger comprueban modos incompatibles y eventos duplicados. Las [descargas y referencias congeladas](docs/separacion-datos.md) utilizan rutas separadas; la API rechaza escrituras y descargas sobre almacenes congelados.
+
+La [ampliación a MGC](docs/ampliacion-mgc.md) identifica el producto, candidatos y regla de rollover. MGC tiene entrega física; el catálogo heredado y Yahoo MGC=F siguen sin ser una cadena verificada de contratos negociables. Las fechas específicas de aviso, calendarios y códigos del proveedor se deben verificar antes de nuevos experimentos de ejecución.

@@ -1,0 +1,12 @@
+{
+  "dataset_id": "nyse-equities-2024-v1",
+  "frozen_manifest_sha256": "4f671af5a25a97f942fc03e540353dfffecdc5eeb7de923c9341e0cf051e6a0e",
+  "price_column": "close",
+  "adjusted_close_role": "audit_only",
+  "policy": {
+    "price_basis": "split_adjusted",
+    "dividends": "excluded",
+    "splits": "embedded",
+    "version": "1.0.0"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "format_version": 1,
+  "reviewed_on": "2026-10-21",
+  "product_root": "MGC",
+  "venue": "COMEX",
+  "currency": "USD",
+  "contract_multiplier_troy_ounces": "10",
+  "price_tick_usd_per_ounce": "0.10",
+  "tick_value_usd": "1.00",
+  "settlement_method": "physical",
+  "delivery_form": "ACE representing a one-tenth interest in a 100-troy-ounce warrant",
+  "sources": [
+    "https://www.cmegroup.com/content/dam/cmegroup/rulebook/COMEX/1a/120.pdf",
+    "https://www.cmegroup.com/trading/metals/files/metals-prod-guide-2024.pdf"
+  ],
+  "last_trade_rule": "Third last exchange business day of delivery month",
+  "contract_month_codes": {
+    "02": "G",
+    "04": "J",
+    "06": "M",
+    "08": "Q",
+    "10": "V",
+    "12": "Z"
+  },
+  "candidate_contracts": [
+    {
+      "instrument_id": "MGC-2026-12",
+      "contract_month": "2026-12",
+      "display_symbol": "MGCZ6",
+      "last_trade_date_derived": "2026-12-29",
+      "first_notice_date": null,
+      "broker_closeout_date": null,
+      "exchange_calendar_verified": false,
+      "provider_security_id": null,
+      "execution_eligible": false
+    },
+    {
+      "instrument_id": "MGC-2027-02",
+      "contract_month": "2027-02",
+      "display_symbol": "MGCG7",
+      "last_trade_date_derived": "2027-02-24",
+      "first_notice_date": null,
+      "broker_closeout_date": null,
+      "exchange_calendar_verified": false,
+      "provider_security_id": null,
+      "execution_eligible": false
+    }
+  ],
+  "rollover_policy": {
+    "id": "mgc-calendar-before-delivery-v1",
+    "trigger": "Five reviewed CME trading sessions before the earliest of first_notice_date, last_trade_date, and broker_closeout_date",
+    "target": "Next eligible listed maturity with verified provider security ID and overlapping raw price observations",
+    "execution": "Close old and open new at the scheduled session open; decisions fixed before that open",
+    "costs": "Two executions with their own commission, spread and slippage",
+    "missing_calendar_or_contract_data": "Reject experiment; do not infer NYSE sessions, notices, provider IDs, prices or volume",
+    "continuous_adjustment": "none",
+    "continuous_usage": "research/reference only; fills and PnL require individual contract prices and contract IDs"
+  },
+  "legacy_reference": {
+    "instrument_id": "MGC",
+    "provider_symbol": "MGC=F",
+    "composition_and_roll_verified": false,
+    "tradable_prices": false
+  },
+  "implementation_status": "Identification and rollover contract defined; production chain, notice dates, broker cutoff, CME session calendar and contract-level price history still required"
+}

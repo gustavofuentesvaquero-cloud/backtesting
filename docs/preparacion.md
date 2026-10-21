@@ -29,7 +29,7 @@ Se utiliza como raíz del paquete la carpeta superior a `docs`, que contiene `py
 ## Evidencia local
 
 - Antes de separar las pruebas, la suite original ejecutó **113 casos**, todos correctos.
-- La referencia actual ejecuta **140 casos unitarios y 14 históricos**, **154 en total**, sin errores ni casos omitidos. Incluye cuatro casos de aislamiento, tres del control de commits preparados y veintiún casos del conjunto inicial identificado, sus metadatos y calidad diaria.
+- La referencia actual ejecuta **155 casos unitarios y 14 históricos**, **169 en total**, sin errores ni casos omitidos. Incluye cuatro casos de aislamiento, tres del control de commits preparados y veintiún casos del conjunto inicial identificado, sus metadatos y calidad diaria.
 - La instalación del wheel se comprobó en otro entorno virtual sin acceso al código fuente por `PYTHONPATH`, usando dependencias locales y sin descargar cotizaciones. Esta comprobación motivó corregir la búsqueda del esquema de despliegue en una instalación normal.
 - Los cinco históricos congelados pasan los controles estructurales de fechas, OHLC, volumen e identificador. Se registra una tolerancia numérica de `1e-10` absoluta y relativa para diferencias de coma flotante en los límites OHLC.
 - `pip check` no detecta dependencias incompatibles. Se verificaron en entornos limpios los 18 paquetes del núcleo y los 35 de la variante de descarga, comprobando cada versión frente a su lock. Los paquetes compartidos tienen versiones idénticas en ambos archivos. yfinance se importa correctamente; no se ha comprobado su servicio remoto.
@@ -72,3 +72,5 @@ Para cambiar una referencia histórica, crear otra carpeta con `scripts.data_bas
 6. Después de cerrar esos puntos, ejecutar comparaciones con fechas y costes comunes y periodos reservados para evaluación.
 
 Los tests de regresión no prueban estos requisitos completos. El caso de invariancia nuevo cubre un escenario concreto sin zonas de control. BE y NEM en 2024 disponen ya de identidad, procedencia y sesiones verificadas según el [contrato del conjunto inicial](datos-iniciales-acciones.md). La contabilidad de acciones corporativas en el motor, las demás series y el rollover de futuros siguen pendientes antes de la investigación comparativa.
+
+La entrega de política de datos añade [acciones corporativas](acciones-corporativas.md), [protección de referencias congeladas](separacion-datos.md) y la [especificación para ampliar a MGC](ampliacion-mgc.md). El informe local es `artifacts/preparation/data-policy-tests.json`. Los datos de precios congelados y sus metadatos conservan sus bytes; se corrige la referencia operativa de MGC para describir su entrega física y la identidad todavía no verificada. Las fechas de primer aviso y los identificadores nativos siguen pendientes para experimentar con contratos individuales.

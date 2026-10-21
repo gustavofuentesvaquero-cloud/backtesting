@@ -11,6 +11,17 @@ import duckdb
 import pandas as pd
 
 
+def ensure_mutable_data_path(path: str | Path) -> None:
+    """Reject writes below accepted datasets, including new nested directories."""
+    root = Path(__file__).resolve().parents[2]
+    path = Path(path).resolve()
+    protected = (root / "data" / "frozen", root / "tests" / "fixtures" / "historical")
+    if any(path.is_relative_to(p.resolve()) for p in protected) or any(
+        (parent / "manifest.json").is_file() for parent in (path, *path.parents)
+    ):
+        raise PermissionError("Frozen data stores are read-only; download into a separate operational directory")
+
+
 class MarketDataStore:
     """High-performance columnar storage and analytics using DuckDB and Parquet."""
 
@@ -19,12 +30,20 @@ class MarketDataStore:
             self.base_dir = Path(__file__).resolve().parents[2] / "data" / "historical"
         else:
             self.base_dir = Path(base_dir)
+        if not self.base_dir.exists():
+            ensure_mutable_data_path(self.base_dir)
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self._con = duckdb.connect(":memory:")
 
+    def _assert_writable(self) -> None:
+        ensure_mutable_data_path(self.base_dir)
+
     def _parquet_path(self, instrument_id: str, timeframe: str = "1d") -> Path:
-        sanitized = instrument_id.replace("/", "_").replace("=", "_").upper()
-        return self.base_dir / f"{sanitized}_{timeframe}.parquet"
+        sanitized = instrument_id.replace("/", "_").replace(chr(92), "_").replace("=", "_").upper()
+        path = self.base_dir / f"{sanitized}_{timeframe}.parquet"
+        if not path.resolve().is_relative_to(self.base_dir.resolve()):
+            raise ValueError("Bar path must stay inside its data store")
+        return path
 
     def save_bars(
         self,
@@ -33,6 +52,7 @@ class MarketDataStore:
         timeframe: str = "1d",
     ) -> Path:
         """Store standardized OHLCV bars into a compressed Parquet file."""
+        self._assert_writable()
         if df.empty:
             raise ValueError("Cannot save an empty DataFrame.")
 
@@ -221,7 +241,8 @@ class MarketDataStore:
 
 
     def fetch_and_store_cme_mgc(self, period: str = "2y", timeframe: str = "1d") -> Path:
-        """Download official CME Micro Gold (MGC=F) data from Yahoo Finance and store in Parquet."""
+        """Download Yahoo MGC=F reference series; not verified individual CME contracts."""
+        self._assert_writable()
         return self.fetch_and_store_ticker("MGC=F", instrument_id="MGC", period=period, timeframe=timeframe)
 
     def fetch_and_store_ticker(
@@ -231,7 +252,8 @@ class MarketDataStore:
         period: str = "5y",
         timeframe: str = "1d",
     ) -> Path:
-        """Download official historical data for any stock/ETF/ticker from Yahoo Finance and store in Parquet."""
+        """Download Yahoo history into the writable operational cache."""
+        self._assert_writable()
         import yfinance as yf
 
         inst_id = instrument_id or ticker

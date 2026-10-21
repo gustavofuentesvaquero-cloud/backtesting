@@ -7,6 +7,7 @@
   "required": ["version", "mark_model", "reporting_currency", "max_conversion_age_ns", "exposure_limits", "margin_rules"],
   "properties": {
     "version": {"type": "string", "minLength": 1},
+    "equity_price_basis": {"enum": ["raw", "split_adjusted", "total_return_adjusted"], "default": "raw"},
     "mark_model": {"const": "conservative_l1_bid_for_longs_ask_for_shorts"},
     "reporting_currency": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[A-Z]{3}$"}]},
     "max_conversion_age_ns": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 0}]},

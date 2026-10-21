@@ -31,6 +31,9 @@ jobs:
         run: python -m pip install --no-deps --no-build-isolation -e .
       - name: Check dependencies
         run: python -m pip check
+      - name: Verify corporate-action policy
+        if: matrix.suite == 'historical'
+        run: python -m scripts.equity_dataset --check-actions config/equity-corporate-actions.json
       - name: Diagnose daily bar quality
         if: matrix.suite == 'historical'
         run: python -m scripts.equity_dataset --quality-report artifacts/daily-quality.json

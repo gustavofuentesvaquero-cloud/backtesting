@@ -71,6 +71,8 @@ def verify_baseline(target: Path = DEFAULT_TARGET) -> dict:
 def create_baseline(source: Path, target: Path, symbols=SYMBOLS) -> dict:
     if target.exists():
         raise ValueError(f"Refusing to overwrite existing baseline directory: {target}")
+    if target.resolve().is_relative_to(source.resolve()) or source.resolve().is_relative_to(target.resolve()):
+        raise ValueError("Downloads and frozen datasets must have separate, non-overlapping directories")
     # Inspect every input before copying, and do not infer provider or adjustment metadata.
     files = {f"{symbol}_1d.parquet": inspect_bars(source / f"{symbol}_1d.parquet", symbol) for symbol in symbols}
     manifest = {

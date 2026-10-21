@@ -4,7 +4,7 @@ import unittest
 
 import duckdb
 
-from scripts.equity_dataset import DEFAULT_TARGET, verify, verify_metadata, dataset_quality_report
+from scripts.equity_dataset import DEFAULT_TARGET, verify, verify_metadata, dataset_quality_report, verify_action_policy, ROOT
 
 
 class FrozenEquityDatasetTests(unittest.TestCase):
@@ -12,6 +12,8 @@ class FrozenEquityDatasetTests(unittest.TestCase):
         manifest = verify()
         metadata = verify_metadata()
         self.assertEqual({i["instrument_id"] for i in metadata["instruments"]}, {"BE", "NEM"})
+        actions = verify_action_policy(ROOT / "config" / "equity-corporate-actions.json")
+        self.assertFalse(actions["NEM"]["dividend_cash_applied"])
         report = dataset_quality_report()
         self.assertTrue(report["successful"])
         for item in report["instruments"].values():

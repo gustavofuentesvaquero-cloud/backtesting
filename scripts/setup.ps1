@@ -53,6 +53,7 @@ try {
     Invoke-Checked -Executable $venvPython -Arguments @('-m', 'pip', 'check')
     Invoke-Checked -Executable $venvPython -Arguments @('-m', 'scripts.data_baseline')
     Invoke-Checked -Executable $venvPython -Arguments @('-m', 'scripts.equity_dataset')
+    Invoke-Checked -Executable $venvPython -Arguments @('-m', 'scripts.equity_dataset', '--check-actions', 'config/equity-corporate-actions.json')
     if (-not $SkipChecks) {
         Invoke-Checked -Executable $venvPython -Arguments @('-m', 'scripts.check', '--suite', 'all', '--report', 'artifacts/preparation/checks.json')
     }

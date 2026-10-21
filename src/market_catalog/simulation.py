@@ -425,9 +425,12 @@ class PortfolioPolicy:
     margin_rules: tuple[MarginRule, ...] = ()
     version: str = "1.0.0"
     mark_model: str = "conservative_l1_bid_for_longs_ask_for_shorts"
+    equity_price_basis: str = "raw"
 
     def __post_init__(self) -> None:
         _validate_model_version(self.version, "portfolio_policy.version")
+        if self.equity_price_basis not in {"raw", "split_adjusted", "total_return_adjusted"}:
+            raise ValueError("Unsupported equity_price_basis.")
         if self.mark_model != "conservative_l1_bid_for_longs_ask_for_shorts":
             raise ValueError("Unsupported portfolio mark_model.")
         if self.reporting_currency is not None and (
@@ -460,7 +463,7 @@ class PortfolioPolicy:
         object.__setattr__(self, "margin_rules", rules)
 
     def to_mapping(self) -> dict[str, Any]:
-        return {
+        result = {
             "version": self.version,
             "mark_model": self.mark_model,
             "reporting_currency": self.reporting_currency,
@@ -484,11 +487,15 @@ class PortfolioPolicy:
                 for item in self.margin_rules
             ],
         }
+        # Preserve recorded raw-policy hashes; the schema default is raw.
+        if self.equity_price_basis != "raw":
+            result["equity_price_basis"] = self.equity_price_basis
+        return result
 
     @classmethod
     def from_mapping(cls, value: Mapping[str, Any]) -> "PortfolioPolicy":
         expected = {"version", "mark_model", "reporting_currency", "max_conversion_age_ns", "exposure_limits", "margin_rules"}
-        if not isinstance(value, Mapping) or set(value) != expected:
+        if not isinstance(value, Mapping) or set(value) - {"equity_price_basis"} != expected:
             raise ValueError("Portfolio policy has missing or unknown fields.")
         if not isinstance(value["exposure_limits"], (list, tuple)) or not isinstance(value["margin_rules"], (list, tuple)):
             raise ValueError("Portfolio policy exposure_limits and margin_rules must be arrays.")
@@ -519,6 +526,7 @@ class PortfolioPolicy:
             margin_rules=rules,
             version=value["version"],
             mark_model=value["mark_model"],
+            equity_price_basis=value.get("equity_price_basis", "raw"),
         )
 
 
@@ -1321,6 +1329,7 @@ class Portfolio:
                 raise ValueError(f"Margin rule references unknown instrument {rule.instrument_id!r}.")
         self._ledger: list[LedgerEntry] = []
         self._entry_ids: set[str] = set()
+        self._corporate_action_keys: set[tuple] = set()
         self._fill_ids: set[str] = set()
         self._fill_entries: dict[str, Fill] = {}
         self._commissions_by_fill: dict[str, Decimal] = {}
@@ -1448,6 +1457,15 @@ class Portfolio:
             raise TypeError("entry must be a LedgerEntry.")
         if entry.entry_id in self._entry_ids:
             raise ValueError(f"Duplicate ledger entry_id {entry.entry_id!r}.")
+        action_key = None
+        if entry.kind in {"split", "dividend"}:
+            if self.policy.equity_price_basis != "raw":
+                raise ValueError("Adjusted equity prices cannot be combined with cash dividend or position split events")
+            if entry.timestamp_ns is None:
+                raise ValueError("Corporate actions require an explicit effective timestamp")
+            action_key = (entry.kind, entry.instrument_id, entry.timestamp_ns)
+            if action_key in self._corporate_action_keys:
+                raise ValueError("Duplicate corporate action at the same instrument/effective timestamp")
         if entry.kind == "fill":
             if entry.fill is None or entry.instrument_id not in self._instruments:
                 raise ValueError("Fill ledger entries require a known instrument and immutable Fill.")
@@ -1602,6 +1620,8 @@ class Portfolio:
             if entry.arrival_ordinal is not None:
                 self._as_of_ordinal = entry.arrival_ordinal
             self._version += 1
+        if action_key is not None:
+            self._corporate_action_keys.add(action_key)
         self._entry_ids.add(entry.entry_id)
         self._entry_sequence += 1
         self._ledger.append(entry)

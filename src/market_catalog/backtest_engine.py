@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 
 from .storage import MarketDataStore, detect_price_control_zones
+from .corporate_actions import EquityActionPolicy
 
 
 @dataclass(frozen=True)
@@ -79,6 +80,7 @@ class BacktestResult:
             "=" * 60,
             f"RESULTADOS DE BACKTEST MULTI-CICLO: {self.kpis.get('symbol', 'N/A')}",
             "=" * 60,
+            f"Base de rendimiento: {self.kpis.get('corporate_actions', {}).get('return_basis', 'unknown')} | Dividendos en efectivo: no",
             f"Periodo: {self.kpis.get('start_date', '-')} a {self.kpis.get('end_date', '-')} ({self.kpis.get('total_bars', 0)} sesiones)",
             f"Dirección: {self.kpis.get('direction', 'both').upper()} | Capital Inicial: ${self.kpis.get('initial_capital', 0.0):,.2f}",
             "-" * 60,
@@ -101,6 +103,8 @@ class BacktestResult:
             f"Calmar Ratio:           {self.kpis.get('calmar_ratio', 0.0):.2f}",
             "=" * 60,
         ]
+        if "futures_data" in self.kpis:
+            lines.insert(3, "Datos futuros: referencia del proveedor; contratos y rollover sin verificar.")
         return "\n".join(lines)
 
     def to_dict(self) -> dict[str, Any]:
@@ -133,6 +137,7 @@ class RollingBacktestEngine:
         multiplier: float | None = None,
         auto_close_at_end: bool = True,
         use_control_zones: bool = False,
+        corporate_action_policy: EquityActionPolicy | None = None,
     ) -> BacktestResult:
         """Ejecuta la simulación multi-ciclo de 5 años barra a barra con cero anticipación."""
         if lookback_bars < 5:
@@ -144,6 +149,8 @@ class RollingBacktestEngine:
         bars_df = self.store.load_bars(sym_upper, timeframe="1d")
         if bars_df.empty:
             raise ValueError(f"No hay barras históricas para el símbolo '{sym_upper}' en MarketDataStore")
+
+        action_report = (corporate_action_policy or EquityActionPolicy()).validate_daily(bars_df)
 
         # Asegurar orden cronológico estricto
         bars_df = bars_df.copy()
@@ -730,6 +737,11 @@ class RollingBacktestEngine:
             trade_log=trade_log_df,
             equity_curve=equity_curve_df,
         )
+
+        kpis["corporate_actions"] = action_report
+        if sym_upper in {"MGC", "MGC=F"}:
+            kpis["futures_data"] = {"kind": "legacy_provider_reference", "tradable_prices_verified": False,
+                                   "rollover_verified": False}
 
         return BacktestResult(
             trade_log=trade_log_df,

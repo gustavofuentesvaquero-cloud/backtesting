@@ -20,6 +20,7 @@ from .event_engine import EventProcessor, EventProcessorConfig
 from .events import RawFrame
 from .loader import load_catalog
 from .models import Catalog
+from .corporate_actions import EquityActionPolicy
 from .normalization import JsonFixtureNormalizer
 from .pipeline import MarketDataPipeline
 from .quality import DataQualityMonitor
@@ -594,6 +595,7 @@ def run_stock_macro_backtest(
     catalog: Catalog | None = None,
     base_dir: Path | None = None,
     direction: str = "long",
+    corporate_action_policy: EquityActionPolicy | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any], dict[str, Any]]:
     """Ejecuta la simulación auditada en un activo (GOLD, NEM, MGC) y devuelve métricas completas."""
     root = Path(__file__).resolve().parents[2]
@@ -622,6 +624,8 @@ def run_stock_macro_backtest(
     bars_df = store.load_bars(symbol, timeframe="1d")
     if bars_df.empty:
         raise ValueError(f"No hay barras históricas para {symbol}")
+
+    action_report = (corporate_action_policy or EquityActionPolicy()).validate_daily(bars_df)
 
     recent_bars = bars_df.tail(lookback_bars).copy()
 
@@ -892,5 +896,11 @@ def run_stock_macro_backtest(
         "Instrucción Operativa": opp["instruccion"],
         "Razonamiento Detallado": opp["razonamiento"],
     }
+
+    resumen_cartera["Base de rendimiento"] = action_report["return_basis"]
+    resumen_cartera["Base de precios declarada"] = action_report["policy"]["price_basis"]
+    resumen_cartera["Dividendos en efectivo incluidos"] = False
+    estado_diario["Base de rendimiento"] = action_report["return_basis"]
+    estado_diario["Dividendos en efectivo incluidos"] = False
 
     return ops, metricas_mercado, resumen_cartera, estado_diario

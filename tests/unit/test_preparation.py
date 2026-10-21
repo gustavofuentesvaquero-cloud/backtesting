@@ -39,7 +39,11 @@ class DataPreparationTests(unittest.TestCase):
         altered["volume"] *= 2
         store = MarketDataStore(base_dir=target)
         self.addCleanup(store._con.close)
-        store.save_bars("TEST", altered)
+        # Corrupt the bytes directly: the public store must refuse frozen writes.
+        with duckdb.connect(":memory:") as con:
+            altered["instrument_id"] = "TEST"
+            con.register("changed", altered)
+            con.execute("COPY changed TO ? (FORMAT PARQUET)", [str(target / "TEST_1d.parquet")])
         with self.assertRaisesRegex(ValueError, "changed"):
             verify_baseline(target)
         (target / "TEST_1d.parquet").unlink()

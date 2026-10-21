@@ -16,7 +16,9 @@ import numpy as np
 import pandas as pd
 
 from scripts.data_baseline import inspect_bars
+from market_catalog.storage import ensure_mutable_data_path
 from market_catalog.historical_quality import assess_daily_bars, validate_daily_bars
+from market_catalog.corporate_actions import EquityActionPolicy, INITIAL_EQUITY_POLICY
 
 ROOT = Path(__file__).resolve().parents[1]
 DATASET_ID = "nyse-equities-2024-v1"
@@ -138,6 +140,7 @@ def validate_catalog(catalog: dict) -> None:
 
 
 def download(target: Path) -> None:
+    ensure_mutable_data_path(target)
     if target.exists():
         raise ValueError(f"Refusing to overwrite downloads: {target}")
     target.mkdir(parents=True)
@@ -173,6 +176,8 @@ def read_downloads(source: Path) -> tuple[dict, dict]:
 def freeze(source: Path, target: Path, catalog_path: Path = ROOT / "data" / "gold_miners_stocks.json") -> dict:
     if target.exists():
         raise ValueError(f"Refusing to overwrite frozen dataset: {target}")
+    if target.resolve().is_relative_to(source.resolve()) or source.resolve().is_relative_to(target.resolve()):
+        raise ValueError("Downloads and frozen datasets must have separate, non-overlapping directories")
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
     validate_catalog(catalog)
     frames, receipts = read_downloads(source)
@@ -306,19 +311,42 @@ def verify_metadata(path: Path = DEFAULT_METADATA, target: Path = DEFAULT_TARGET
     return actual
 
 
+def verify_action_policy(path: Path, target: Path = DEFAULT_TARGET) -> dict:
+    manifest = verify(target)
+    contract = json.loads(path.read_text(encoding="utf-8"))
+    expected = {"dataset_id": manifest["dataset_id"],
+                "frozen_manifest_sha256": sha256(target / "manifest.json"),
+                "price_column": "close", "adjusted_close_role": "audit_only",
+                "policy": INITIAL_EQUITY_POLICY.to_mapping()}
+    if contract != expected:
+        raise ValueError("Corporate-action contract differs from the reviewed split-adjusted dataset policy")
+    policy = EquityActionPolicy.from_mapping(contract["policy"])
+    reports = {}
+    for symbol in SYMBOLS:
+        with duckdb.connect(":memory:") as con:
+            bars = con.execute("SELECT * FROM read_parquet(?)", [str(target / f"{symbol}_1d.parquet")]).df()
+        reports[symbol] = policy.validate_daily(bars)
+    return reports
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--download", action="store_true", help="network required; refuses existing downloads")
     action.add_argument("--freeze", action="store_true", help="create from downloads; refuses existing target")
     action.add_argument("--export-metadata", type=Path, metavar="FILE", help="write a derived provenance summary")
+    action.add_argument("--check-actions", type=Path, metavar="FILE", help="verify the corporate-action contract")
     action.add_argument("--quality-report", type=Path, metavar="FILE", help="write diagnostics, also on failure")
     action.add_argument("--check-metadata", type=Path, metavar="FILE", help="verify a saved provenance summary")
     parser.add_argument("--downloads", type=Path, default=DEFAULT_DOWNLOADS)
     parser.add_argument("--target", type=Path, default=DEFAULT_TARGET)
     args = parser.parse_args(argv)
     try:
-        if args.quality_report:
+        if args.check_actions:
+            verify_action_policy(args.check_actions, args.target)
+            print("Verified corporate-action policy: price return, no duplicate cash or position adjustments")
+        elif args.quality_report:
+            ensure_mutable_data_path(args.quality_report)
             if args.quality_report.resolve().is_relative_to(args.target.resolve()):
                 raise ValueError("Quality report must stay outside the frozen dataset")
             report = dataset_quality_report(args.target)
@@ -327,6 +355,7 @@ def main(argv=None) -> int:
             print(f"Daily bar quality {'passed' if report['successful'] else 'failed'}; report: {args.quality_report}")
             return 0 if report["successful"] else 1
         elif args.export_metadata:
+            ensure_mutable_data_path(args.export_metadata)
             if args.export_metadata.resolve().is_relative_to(args.target.resolve()):
                 raise ValueError("Metadata export must stay outside the frozen dataset")
             metadata = dataset_metadata(args.target)
