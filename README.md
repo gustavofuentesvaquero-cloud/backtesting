@@ -71,7 +71,7 @@ python -m scripts.check --suite all --report artifacts/preparation/checks.json
 
 La [automatización de pruebas](docs/automatizacion-pruebas.md) incluye un hook local antes de cada commit y GitHub Actions en cada push y actualización de pull request. El hook está activado en este repositorio; en otro clon se activa con `git config --local core.hooksPath .githooks` y utiliza el entorno `.venv`. Comprueba una copia del contenido preparado en Git, incluyendo ambos grupos de pruebas.
 
-GitHub Actions define cuatro trabajos independientes: unitarias e integración histórica, en Windows y Linux, con Python 3.12. La ejecución remota requiere configurar un repositorio GitHub y subir el workflow junto al proyecto; actualmente no hay remoto configurado. Consultar [el estado de preparación](docs/preparacion.md) para la evidencia local.
+GitHub Actions define cuatro trabajos independientes: unitarias e integración histórica, en Windows y Linux, con Python 3.12. El remoto `origin` apunta a [backtesting en GitHub](https://github.com/gustavofuentesvaquero-cloud/backtesting), con rama principal `main`. Las ejecuciones y sus resultados se consultan en [GitHub Actions](https://github.com/gustavofuentesvaquero-cloud/backtesting/actions). Consultar [el estado de preparación](docs/preparacion.md) para la evidencia local.
 
 ## Verificar el paquete instalado
 

@@ -48,7 +48,7 @@ Cada trabajo instala las versiones de `requirements.lock`, instala el proyecto y
 - Hook activado en el repositorio interior elegido como raíz del proyecto y ejecutado correctamente con `git hook run pre-commit`.
 - Suite del árbol de trabajo: **121 unitarias y 12 históricas**, **133 casos correctos**. Los tres casos nuevos verifican el comportamiento del control sobre contenido preparado, cambios sin preparar y ausencia del ejecutor en el índice.
 - YAML analizado y comprobado: disparadores, matriz de cuatro combinaciones, propagación de fallos y publicación de artefactos.
-- El repositorio todavía no tiene remoto configurado. La parte de GitHub Actions quedará operativa cuando el workflow y el proyecto estén en un repositorio GitHub con Actions habilitado. No se ha ejecutado ni afirmado una comprobación remota.
+- El remoto `origin` está conectado a [gustavofuentesvaquero-cloud/backtesting](https://github.com/gustavofuentesvaquero-cloud/backtesting), con rama principal `main`. Cada push dispara el workflow; consultar los resultados de cada commit en [GitHub Actions](https://github.com/gustavofuentesvaquero-cloud/backtesting/actions). La evidencia local anterior no sustituye el resultado remoto.
 
 Los informes locales están en `artifacts/preparation/automation-tests.json`, `automation-tests.log` y `workflow-audit.json`. Las dependencias de validación del YAML se aislaron en `artifacts/ci-validation`, sin modificar los locks del proyecto.
 

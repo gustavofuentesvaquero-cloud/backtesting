@@ -22,7 +22,7 @@ Se utiliza como raíz del paquete la carpeta superior a `docs`, que contiene `py
 | Congelación y verificación de históricos | `scripts/data_baseline.py` | Casos de manipulación, archivos ausentes, datos inválidos y rechazo de sobrescritura |
 | Regresiones históricas separadas | `tests/integration` | Mismos casos existentes, aplicados a copias congeladas |
 | Verificación de instalación del wheel | `scripts/check_wheel.py` | Entorno limpio fuera del repositorio, importación y validaciones de catálogo, despliegue y alertas |
-| Automatización de verificaciones | `.githooks/pre-commit`, `scripts/check_staged.py`, `.github/workflows/checks.yml` | Hook local activo y probado; cuatro trabajos CI configurados para Windows/Linux; remoto pendiente |
+| Automatización de verificaciones | `.githooks/pre-commit`, `scripts/check_staged.py`, `.github/workflows/checks.yml` | Hook local activo y probado; cuatro trabajos CI configurados para Windows/Linux; remoto `origin` conectado a GitHub |
 | Guía de arranque actualizada | `README.md` | Comandos de preparación, verificaciones y flujos disponibles |
 
 ## Evidencia local
@@ -43,7 +43,7 @@ La verificación ampliada de dependencias añade `dependency-lock-audit.json`, `
 
 La separación explícita utiliza `tests/unit` y `tests/integration`. `scripts.check` descubre solo el grupo seleccionado; CI ejecuta cada grupo en un trabajo independiente para Windows y Linux. Los resultados de la entrega de separación están en `test-separation.json` y `unit-without-histories.json`, con sus logs. Las regresiones de integración siguen utilizando los cinco archivos congelados y comprobados de `tests/fixtures/historical`.
 
-La [automatización](automatizacion-pruebas.md) añade un hook local verificado y los informes `automation-tests.json` y `workflow-audit.json`. Las pruebas de integración y las unitarias conservan trabajos independientes aunque falle otra combinación de la matriz. GitHub Actions está configurado; el repositorio no tiene remoto y su ejecución remota sigue pendiente.
+La [automatización](automatizacion-pruebas.md) añade un hook local verificado y los informes `automation-tests.json` y `workflow-audit.json`. Las pruebas de integración y las unitarias conservan trabajos independientes aunque falle otra combinación de la matriz. GitHub Actions está configurado y el remoto `origin` apunta a `https://github.com/gustavofuentesvaquero-cloud/backtesting.git`. Los resultados remotos se consultan en la pestaña Actions del repositorio.
 
 Antes de editar se guardaron 86 archivos originales en `artifacts/preparation/before-preparation.zip`, acompañados por `before-preparation.sha256.json`. Esa copia verificada se registró como primer commit local del repositorio interior: `a94f6b6` (`chore: snapshot imported backtesting project before preparation`). El estado preparado se guarda en el commit identificado por la etiqueta local `before-directory-reorganization`; la [decisión de raíz](raiz-proyecto.md) explica cómo comprobarlo. El registro es local, sin publicación del repositorio ni de los datos.
 

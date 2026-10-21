@@ -32,7 +32,7 @@ Esfuerzo orientativo: 1–2 días de desarrollo.
 2. Declarar las dependencias de ejecución y las opcionales de descarga; fijar un entorno reproducible y documentar su instalación. Completado para CPython 3.12: ambos entornos se instalaron en limpio y sus versiones se contrastaron con los locks; véase [Instalación](../README.md#preparar-el-entorno-en-windows).
 3. Actualizar el README con los flujos realmente disponibles y sus límites.
 4. Separar pruebas unitarias con datos sintéticos de pruebas de integración con históricos congelados. Las pruebas unitarias deben funcionar sin red. Completado: `tests/unit` y `tests/integration` se descubren por separado, y las 118 unitarias pasan también en una copia sin históricos, con APIs de red y métodos de descarga bloqueados.
-5. Establecer una ejecución automática de la suite en cada cambio. Hook local activo antes de cada commit y workflow configurado para pushes y pull requests; la [automatización](automatizacion-pruebas.md) documenta las comprobaciones y la conexión a GitHub pendiente por falta de remoto.
+5. Establecer una ejecución automática de la suite en cada cambio. Hook local activo antes de cada commit y workflow configurado para pushes y pull requests; la [automatización](automatizacion-pruebas.md) documenta las comprobaciones y el remoto GitHub `gustavofuentesvaquero-cloud/backtesting` conectado.
 
 **Criterio de salida:** en un entorno limpio, una instalación documentada permite importar el paquete y ejecutar las pruebas sin depender de archivos o paquetes no declarados. Los fallos funcionales quedan identificados, y la referencia aceptada queda versionada.
 
