@@ -106,7 +106,7 @@ exposición y margen se describe en
 Ejecuta la suite desde la raíz:
 
 ```console
-python -m unittest discover -s tests -v
+python -m scripts.check --suite all
 ```
 
 El benchmark sintético, sin objetivos numéricos ni requisitos de proveedor, se

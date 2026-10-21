@@ -128,7 +128,7 @@ snapshot de recuperación y actualización L1.
 Ejecutar desde la raíz del repositorio:
 
 ```console
-python -m unittest discover -s tests -v
+python -m scripts.check --suite all
 ```
 
 La suite comprueba el ciclo del adaptador, filtros de suscripción, preservación

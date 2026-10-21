@@ -12,7 +12,7 @@ from market_catalog import CatalogLoadError, CatalogValidationError, load_catalo
 from market_catalog.cli import main as cli_main
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def empty_catalog() -> dict:

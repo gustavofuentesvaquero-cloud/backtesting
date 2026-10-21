@@ -13,29 +13,37 @@ Se utiliza como raíz del paquete la carpeta superior a `docs`, que contiene `py
 | Preparativo | Ubicación | Comprobación |
 |---|---|---|
 | Dependencias de ejecución completas y descarga opcional | `pyproject.toml` | Instalación editable, importación y `pip check` |
-| Versiones fijadas para Python 3.12 | `requirements.lock`, `requirements-download.lock` | Núcleo instalado en entorno limpio; importación de yfinance opcional |
+| Versiones fijadas para Python 3.12 | `requirements.lock`, `requirements-download.lock` | Núcleo y variante de descarga instalados en entornos limpios, con versiones exactas verificadas |
 | Preparación de Windows | `scripts/setup.ps1` | Instalación y ejecución de ambos grupos de pruebas |
 | Lanzador diario con prioridad para `.venv` | `actualizar_diario.bat` | Revisión del flujo de selección de Python; no se ejecutó el diario |
 | Ejecutor sin red, con informe JSON | `scripts/check.py` | Pruebas unitarias e históricas; falla ante errores, grupos vacíos o casos omitidos |
-| Casos sintéticos del motor | `tests/test_backtest_engine.py` | Operación calculada a mano, costes, gap en stop, doble toque, calentamiento, repetibilidad e invariancia de un prefijo sin zonas |
+| Casos sintéticos del motor | `tests/unit/test_backtest_engine.py` | Operación calculada a mano, costes, gap en stop, doble toque, calentamiento, repetibilidad e invariancia de un prefijo sin zonas |
 | Históricos de regresión independientes de la caché | `tests/fixtures/historical` | Cinco Parquet copiados sin cambios, manifiesto y SHA-256 |
 | Congelación y verificación de históricos | `scripts/data_baseline.py` | Casos de manipulación, archivos ausentes, datos inválidos y rechazo de sobrescritura |
 | Regresiones históricas separadas | `tests/integration` | Mismos casos existentes, aplicados a copias congeladas |
 | Verificación de instalación del wheel | `scripts/check_wheel.py` | Entorno limpio fuera del repositorio, importación y validaciones de catálogo, despliegue y alertas |
-| Automatización de verificaciones | `.github/workflows/checks.yml` | Configurada para Windows/Linux con Python 3.12; ejecución remota pendiente |
+| Automatización de verificaciones | `.githooks/pre-commit`, `scripts/check_staged.py`, `.github/workflows/checks.yml` | Hook local activo y probado; cuatro trabajos CI configurados para Windows/Linux; remoto pendiente |
 | Guía de arranque actualizada | `README.md` | Comandos de preparación, verificaciones y flujos disponibles |
 
 ## Evidencia local
 
 - Antes de separar las pruebas, la suite original ejecutó **113 casos**, todos correctos.
-- La referencia actual ejecuta **114 casos unitarios y 12 históricos**, **126 en total**, sin errores ni casos omitidos.
+- La referencia actual ejecuta **121 casos unitarios y 12 históricos**, **133 en total**, sin errores ni casos omitidos. Incluye cuatro casos de aislamiento y tres del control de commits preparados.
 - La instalación del wheel se comprobó en otro entorno virtual sin acceso al código fuente por `PYTHONPATH`, usando dependencias locales y sin descargar cotizaciones. Esta comprobación motivó corregir la búsqueda del esquema de despliegue en una instalación normal.
 - Los cinco históricos congelados pasan los controles estructurales de fechas, OHLC, volumen e identificador. Se registra una tolerancia numérica de `1e-10` absoluta y relativa para diferencias de coma flotante en los límites OHLC.
-- `pip check` no detecta dependencias incompatibles y la dependencia opcional yfinance se importa correctamente. No se ha comprobado su servicio remoto.
-- El comando `scripts/setup.ps1` pasa tanto sobre el entorno existente como en una copia independiente con un entorno nuevo, instalando el núcleo desde wheels locales y ejecutando los 126 casos.
+- `pip check` no detecta dependencias incompatibles. Se verificaron en entornos limpios los 18 paquetes del núcleo y los 35 de la variante de descarga, comprobando cada versión frente a su lock. Los paquetes compartidos tienen versiones idénticas en ambos archivos. yfinance se importa correctamente; no se ha comprobado su servicio remoto.
+- `scripts/setup.ps1 -WithDownloads -SkipChecks` instala explícitamente el extra `download`, verifica las dependencias y los históricos congelados. Se comprobó utilizando solo los wheels locales.
+- En la comprobación anterior a esta separación, `scripts/setup.ps1` pasó tanto sobre el entorno existente como en una copia independiente con un entorno nuevo, instalando el núcleo desde wheels locales y ejecutando los 126 casos de esa referencia.
+- Las 118 pruebas unitarias también pasaron en una copia aislada del código que no contenía Parquet históricos ni el diario Excel, manteniendo bloqueadas las APIs de red y los métodos de descarga.
 - Los archivos originales de `data`, incluido el diario Excel, conservan sus hashes iniciales.
 
 Los informes y logs locales están en `artifacts/preparation/`: `original-tests.log`, `checks.json`, `checks.log`, `setup.log`, `setup-clean.log`, `wheel-check.json` y `wheel-check.log`. Son artefactos locales ignorados por Git y se regeneran al ejecutar las herramientas.
+
+La verificación ampliada de dependencias añade `dependency-lock-audit.json`, `wheel-check-download.json`, `wheel-check-download.log` y `setup-download.log`. `scripts.check_wheel --with-downloads` repite la instalación limpia del extra; ambos modos comprueban todas las versiones fijadas y ejecutan `pip check`.
+
+La separación explícita utiliza `tests/unit` y `tests/integration`. `scripts.check` descubre solo el grupo seleccionado; CI ejecuta cada grupo en un trabajo independiente para Windows y Linux. Los resultados de la entrega de separación están en `test-separation.json` y `unit-without-histories.json`, con sus logs. Las regresiones de integración siguen utilizando los cinco archivos congelados y comprobados de `tests/fixtures/historical`.
+
+La [automatización](automatizacion-pruebas.md) añade un hook local verificado y los informes `automation-tests.json` y `workflow-audit.json`. Las pruebas de integración y las unitarias conservan trabajos independientes aunque falle otra combinación de la matriz. GitHub Actions está configurado; el repositorio no tiene remoto y su ejecución remota sigue pendiente.
 
 Antes de editar se guardaron 86 archivos originales en `artifacts/preparation/before-preparation.zip`, acompañados por `before-preparation.sha256.json`. Esa copia verificada se registró como primer commit local del repositorio interior: `a94f6b6` (`chore: snapshot imported backtesting project before preparation`). El estado preparado se guarda en el commit identificado por la etiqueta local `before-directory-reorganization`; la [decisión de raíz](raiz-proyecto.md) explica cómo comprobarlo. El registro es local, sin publicación del repositorio ni de los datos.
 

@@ -14,7 +14,7 @@ from market_catalog.pipeline import MarketDataPipeline
 from market_catalog.quality import DataQualityMonitor, QualityPolicy
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests" / "fixtures" / "market_data.jsonl"
 
 

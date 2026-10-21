@@ -189,7 +189,7 @@ class MinersDailyAutomationTests(unittest.TestCase):
         store.save_bars("TEST_MINER", df, timeframe="1d")
 
         # Crear catálogo temporal con TEST_MINER
-        catalog_path = Path(__file__).resolve().parents[1] / "data" / "gold_miners_stocks.json"
+        catalog_path = Path(__file__).resolve().parents[2] / "data" / "gold_miners_stocks.json"
         catalog = load_catalog(catalog_path)
 
         # Modificar símbolo de test a GOLD para que use el catálogo oficial
@@ -428,7 +428,7 @@ class MinersDailyAutomationTests(unittest.TestCase):
         df = pd.DataFrame(rows)
         store.save_bars("GOLD", df, timeframe="1d")
 
-        catalog_path = Path(__file__).resolve().parents[1] / "data" / "gold_miners_stocks.json"
+        catalog_path = Path(__file__).resolve().parents[2] / "data" / "gold_miners_stocks.json"
         catalog = load_catalog(catalog_path)
 
         ops, metrics, p_summary, daily_status = run_stock_macro_backtest(

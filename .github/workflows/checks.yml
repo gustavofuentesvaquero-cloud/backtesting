@@ -10,10 +10,13 @@ permissions:
 
 jobs:
   checks:
+    name: Tests (${{ matrix.os }}, ${{ matrix.suite }})
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        suite: [unit, historical]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -29,13 +32,15 @@ jobs:
       - name: Check dependencies
         run: python -m pip check
       - name: Verify frozen historical inputs
+        if: matrix.suite == 'historical'
         run: python -m scripts.data_baseline
-      - name: Run both suites without network
-        run: python -m scripts.check --suite all --report artifacts/checks.json
+      - name: Run selected suite without network
+        run: python -m scripts.check --suite ${{ matrix.suite }} --report artifacts/checks.json
       - name: Build and verify installed wheel
+        if: matrix.suite == 'unit'
         run: python -m scripts.check_wheel
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: checks-${{ matrix.os }}
+          name: checks-${{ matrix.os }}-${{ matrix.suite }}
           path: artifacts/

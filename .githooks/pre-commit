@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+if [ -x .venv/Scripts/python.exe ]; then
+    python=.venv/Scripts/python.exe
+elif [ -x .venv/bin/python ]; then
+    python=.venv/bin/python
+else
+    echo 'Prepare the project virtual environment before committing; see README.md.' >&2
+    exit 1
+fi
+exec "$python" -m scripts.check_staged

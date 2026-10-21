@@ -4,12 +4,14 @@
 
 | Área | Cobertura actual | Prueba o comando |
 |---|---|---|
-| Catálogo, esquema y unidades | Catálogo vacío y sintético; ticks, incrementos, monedas, sesiones, calendarios, zonas horarias, vencimientos y referencias inválidas | `tests/test_catalog.py` |
-| Contrato del adaptador disponible | Esquema de eventos, normalización JSONL, payload incompleto, secuencias ausentes, duplicadas, tardías o con gaps, timestamps y recuperación L1/L2 | `tests/test_adapters.py` |
-| Orden y calidad del motor | Orden común entre fuentes, timestamps iguales, ordinales preservados, bloqueo de decisiones inválidas, libro cruzado, saturación, excepciones y presupuestos | `tests/test_event_engine.py` |
-| Órdenes y fills controlados | Compra market al ask, spread amplio, liquidez L1 parcial, límite revaluado con quotes posteriores y límite tocado en el bid sin ejecución garantizada; el remanente se cancela al cerrar sesión | `tests/test_event_engine.py` |
-| Ledger y replay | Replay desde frames grabados con ordinales capturados; igualdad canónica de decisiones, fills, ledger, posiciones y efectivo, además de SHA-256 del resultado | `tests/test_recording.py` |
-| Persistencia y fallos | Checksum de segmento alterado, fallo de escritura inyectado y rechazo de replay incompleto; apertura de captura cerrada y reproducción con un procesador nuevo | `tests/test_recording.py` |
+| Aislamiento unitario | Barras y eventos sintéticos, almacenes temporales, rechazo de DNS/conexiones/UDP y métodos de descarga; independencia de los Parquet locales | `python -m scripts.check --suite unit` |
+| Integración histórica | Regresiones sobre cinco históricos congelados y verificados por manifiesto y SHA-256 | `python -m scripts.check --suite historical` |
+| Catálogo, esquema y unidades | Catálogo vacío y sintético; ticks, incrementos, monedas, sesiones, calendarios, zonas horarias, vencimientos y referencias inválidas | `tests/unit/test_catalog.py` |
+| Contrato del adaptador disponible | Esquema de eventos, normalización JSONL, payload incompleto, secuencias ausentes, duplicadas, tardías o con gaps, timestamps y recuperación L1/L2 | `tests/unit/test_adapters.py` |
+| Orden y calidad del motor | Orden común entre fuentes, timestamps iguales, ordinales preservados, bloqueo de decisiones inválidas, libro cruzado, saturación, excepciones y presupuestos | `tests/unit/test_event_engine.py` |
+| Órdenes y fills controlados | Compra market al ask, spread amplio, liquidez L1 parcial, límite revaluado con quotes posteriores y límite tocado en el bid sin ejecución garantizada; el remanente se cancela al cerrar sesión | `tests/unit/test_event_engine.py` |
+| Ledger y replay | Replay desde frames grabados con ordinales capturados; igualdad canónica de decisiones, fills, ledger, posiciones y efectivo, además de SHA-256 del resultado | `tests/unit/test_recording.py` |
+| Persistencia y fallos | Checksum de segmento alterado, fallo de escritura inyectado y rechazo de replay incompleto; apertura de captura cerrada y reproducción con un procesador nuevo | `tests/unit/test_recording.py` |
 | Benchmark | Camino sintético L1 con estrategia sin intents; histogramas, colas, CPU, memoria, asignaciones, GC y espera del grabador | `benchmarks/bench_event_engine.py` |
 
 El adaptador real de proveedor no está elegido. Por eso sus contratos de protocolo, autenticación, límites, reconexión y semántica de secuencias siguen pendientes; las pruebas actuales no afirman compatibilidad con un proveedor concreto. Las pruebas de reconexión y resnapshot usan el monitor y el adaptador de fixtures. El cierre limpio y replay desde un procesador nuevo cubren la restauración de sesión; no se prueba la recuperación de una escritura interrumpida por un corte del proceso o del sistema operativo.

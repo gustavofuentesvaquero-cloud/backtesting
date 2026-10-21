@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 import pandas as pd
 import numpy as np
-from historical_support import frozen_store
+from tests.integration.historical_support import frozen_store
 
 from market_catalog import (
     BacktestResult,

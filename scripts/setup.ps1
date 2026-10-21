@@ -47,8 +47,9 @@ try {
     }
     Invoke-Checked -Executable $venvPython -Arguments @('-c', 'import sys; assert sys.version_info[:2] == (3, 12), "El entorno fijado requiere Python 3.12"')
     $lockFile = if ($WithDownloads) { 'requirements-download.lock' } else { 'requirements.lock' }
+    $projectSpec = if ($WithDownloads) { '.[download]' } else { '.' }
     Invoke-Checked -Executable $venvPython -Arguments @('-m', 'pip', 'install', '--disable-pip-version-check', '-r', $lockFile)
-    Invoke-Checked -Executable $venvPython -Arguments @('-m', 'pip', 'install', '--no-deps', '--no-build-isolation', '-e', '.')
+    Invoke-Checked -Executable $venvPython -Arguments @('-m', 'pip', 'install', '--no-deps', '--no-build-isolation', '-e', $projectSpec)
     Invoke-Checked -Executable $venvPython -Arguments @('-m', 'pip', 'check')
     Invoke-Checked -Executable $venvPython -Arguments @('-m', 'scripts.data_baseline')
     if (-not $SkipChecks) {

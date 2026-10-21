@@ -2,7 +2,7 @@
 
 import unittest
 from market_catalog import detect_price_control_zones, evaluate_market_opportunity
-from historical_support import frozen_store
+from tests.integration.historical_support import frozen_store
 
 
 class HistoricalDailyTests(unittest.TestCase):

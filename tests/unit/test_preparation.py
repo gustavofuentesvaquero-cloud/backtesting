@@ -11,7 +11,7 @@ import duckdb
 
 from market_catalog import MarketDataStore
 from scripts.data_baseline import create_baseline, inspect_bars, main, verify_baseline
-from test_backtest_engine import scenario
+from tests.unit.test_backtest_engine import scenario
 
 
 class DataPreparationTests(unittest.TestCase):

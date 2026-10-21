@@ -17,7 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--wheelhouse", type=Path, help="install dependencies offline from this directory")
+    parser.add_argument("--with-downloads", action="store_true", help="verify the pinned optional download environment")
     args = parser.parse_args(argv)
+    lock_file = ROOT / ("requirements-download.lock" if args.with_downloads else "requirements.lock")
     output = ROOT / "artifacts" / "wheels"
     output.mkdir(parents=True, exist_ok=True)
     subprocess.run([sys.executable, "-m", "pip", "wheel", "--no-deps", "--no-build-isolation", "--wheel-dir", str(output), str(ROOT)], check=True)
@@ -33,9 +35,12 @@ def main(argv=None) -> int:
         venv.EnvBuilder(with_pip=True).create(environment)
         python = environment / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
         flags = ["--no-index", "--find-links", str(args.wheelhouse.resolve())] if args.wheelhouse else []
-        subprocess.run([str(python), "-m", "pip", "install", *flags, "-r", str(ROOT / "requirements.lock")], check=True, cwd=target)
-        subprocess.run([str(python), "-m", "pip", "install", "--no-index", "--no-deps", str(wheel)], check=True, cwd=target)
+        subprocess.run([str(python), "-m", "pip", "install", *flags, "-r", str(lock_file)], check=True, cwd=target)
+        wheel_spec = str(wheel) + ("[download]" if args.with_downloads else "")
+        subprocess.run([str(python), "-m", "pip", "install", "--no-index", "--no-deps", wheel_spec], check=True, cwd=target)
+        subprocess.run([str(python), "-m", "pip", "check"], check=True, cwd=target)
         probe = '''import json, pathlib, sys
+from importlib.metadata import version
 import market_catalog
 from market_catalog.cli import main
 package = pathlib.Path(market_catalog.__file__).resolve()
@@ -43,18 +48,30 @@ assert package.is_relative_to(pathlib.Path(sys.prefix).resolve()), package
 root = pathlib.Path(sys.argv[1])
 for command, file in [('validate', 'data/market_catalog.json'), ('validate-deployment', 'config/deployment.profile.json'), ('validate-alerts', 'config/alerts.json')]:
     assert main([command, str(root / file)]) == 0, command
-print(json.dumps({'successful': True, 'package_path': str(package), 'checks': ['catalog', 'deployment schema', 'alerts']}))
+locked = {}
+for line in pathlib.Path(sys.argv[2]).read_text(encoding='utf-8').splitlines():
+    if line.strip() and not line.startswith('#'):
+        name, expected = line.split('==', 1)
+        actual = version(name)
+        assert actual == expected, (name, expected, actual)
+        locked[name] = actual
+if sys.argv[3] == 'download':
+    import yfinance
+    assert yfinance.__version__ == locked['yfinance']
+print(json.dumps({'successful': True, 'package_path': str(package), 'checks': ['catalog', 'deployment schema', 'alerts', 'pinned dependency versions'], 'installed_dependencies': locked}))
 '''
         clean_env = dict(os.environ)
         clean_env.pop("PYTHONPATH", None)
-        completed = subprocess.run([str(python), "-c", probe, str(ROOT)], check=True, cwd=target, env=clean_env, capture_output=True, text=True)
+        completed = subprocess.run([str(python), "-c", probe, str(ROOT), str(lock_file), "download" if args.with_downloads else "core"], check=True, cwd=target, env=clean_env, capture_output=True, text=True)
         print(completed.stdout)
         report = json.loads(completed.stdout.splitlines()[-1])
         report["wheel"] = wheel.name
         report["dependencies_installed_offline"] = bool(args.wheelhouse)
+        report["lock_file"] = lock_file.name
         report_dir = ROOT / "artifacts" / "preparation"
         report_dir.mkdir(parents=True, exist_ok=True)
-        (report_dir / "wheel-check.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        report_name = "wheel-check-download.json" if args.with_downloads else "wheel-check.json"
+        (report_dir / report_name).write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return 0
 
 

@@ -21,7 +21,7 @@ from market_catalog.event_engine import _BoundedChannel
 from market_catalog.normalization import JsonFixtureNormalizer
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def synthetic_catalog() -> Catalog:
