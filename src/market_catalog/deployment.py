@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import re
+import sys
 from types import MappingProxyType
 from typing import Any, Mapping
 
@@ -12,6 +13,8 @@ from jsonschema import Draft202012Validator
 
 
 _SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "deployment_profile.schema.json"
+if not _SCHEMA_PATH.is_file():
+    _SCHEMA_PATH = Path(sys.prefix) / "share" / "market-catalog" / "schemas" / "deployment_profile.schema.json"
 _HOST_PATTERN = re.compile(r"^(?=.{1,253}$)(?:[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?)$")
 _TRADING_PERMISSION_TERMS = {"trade", "trading", "orders.write", "order_entry", "execution", "brokerage"}
 

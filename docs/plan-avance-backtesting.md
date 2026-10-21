@@ -2,6 +2,8 @@
 
 Fecha: 21 de octubre de 2026.
 
+Actualización: se ha implementado la base de instalación, verificación y datos congelados descrita en [Preparativos implementados](preparacion.md), con sus resultados y pendientes. La revisión inicial que sigue describe el estado anterior a esa entrega.
+
 ## Objetivo
 
 Obtener un flujo reproducible que permita comparar estrategias sobre los mismos datos, fechas, capital y costes. Cada resultado debe poder explicarse desde sus señales y operaciones, y distinguir el rendimiento utilizado para desarrollar la estrategia del obtenido en periodos reservados para evaluarla.
@@ -26,7 +28,7 @@ Verificación realizada: lectura del código y de las pruebas; intento de ejecuc
 
 Esfuerzo orientativo: 1–2 días de desarrollo.
 
-1. Elegir una raíz del proyecto y registrar un primer estado en Git antes de reorganizar las carpetas duplicadas.
+1. Elegir una raíz del proyecto y registrar un primer estado en Git antes de reorganizar las carpetas duplicadas. La elección y las referencias de partida están documentadas en [Raíz del proyecto](raiz-proyecto.md).
 2. Declarar las dependencias de ejecución y las opcionales de descarga; fijar un entorno reproducible y documentar su instalación.
 3. Actualizar el README con los flujos realmente disponibles y sus límites.
 4. Separar pruebas unitarias con datos sintéticos de pruebas de integración con históricos congelados. Las pruebas unitarias deben funcionar sin red.

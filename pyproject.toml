@@ -5,9 +5,23 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "market-catalog"
 version = "0.1.0"
-description = "Versioned market instrument and calendar catalog for a backtesting engine"
+description = "Historical backtesting, market data contracts and deterministic simulation"
+readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["jsonschema>=4.18,<5"]
+dependencies = [
+    "jsonschema>=4.18,<5",
+    "duckdb>=1.1,<2",
+    "pandas>=2.2,<3",
+    "numpy>=1.26,<3",
+    "openpyxl>=3.1,<4",
+    "tzdata>=2024.1",
+]
+
+[project.optional-dependencies]
+download = ["yfinance>=0.2,<1"]
+
+[project.scripts]
+market-catalog = "market_catalog.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -17,6 +31,3 @@ where = ["src"]
 
 [tool.setuptools.data-files]
 "share/market-catalog/schemas" = ["schemas/market_catalog.schema.json", "schemas/market_event.schema.json", "schemas/strategy_config.schema.json", "schemas/strategy_state.schema.json", "schemas/matching_policy.schema.json", "schemas/portfolio_policy.schema.json", "schemas/ledger_entry.schema.json", "schemas/session_manifest.schema.json", "schemas/session_record.schema.json", "schemas/deployment_profile.schema.json"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]

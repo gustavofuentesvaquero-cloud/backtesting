@@ -16,17 +16,18 @@ El adaptador real de proveedor no está elegido. Por eso sus contratos de protoc
 
 ## Ejecución
 
-Instala el paquete y su dependencia declarada, luego ejecuta:
+Prepara el entorno fijado siguiendo el README, luego ejecuta:
 
 ```console
-python -m pip install -e .
-python -m unittest discover -s tests -v
+python -m scripts.check --suite all --report artifacts/preparation/checks.json
 python benchmarks/bench_event_engine.py --events 10000
 ```
 
 El benchmark imprime JSON. `--no-recorder` permite una pasada sin grabación; `--queue-capacity N` crea un burst que puede saturar las colas. Una ejecución que descarte eventos termina con estado distinto de cero y conserva los contadores en su JSON. El benchmark realiza una pasada sin `tracemalloc` para latencias y throughput y otra instrumentada para memoria y asignaciones, para que `tracemalloc` no distorsione los tiempos reportados.
 
 ## Informe sintético de referencia
+
+Las pruebas unitarias y las regresiones con históricos congelados se ejecutan por separado. Consulta `docs/preparacion.md` para la referencia local y los límites pendientes de verificar en el motor diario.
 
 Medición de una pasada de 10.000 quotes L1 sintéticas, estrategia no-op, grabador activado, capacidad de cada cola de motor 10.000 y capacidad del grabador 160.000. Runtime Python 3.12.14 sobre Windows 10, build 19045. No hubo warmup ni feed externo; el productor envió un burst. Es una observación de este entorno, no una prueba de carga representativa ni una SLA.
 

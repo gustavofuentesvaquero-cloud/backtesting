@@ -1,37 +1,35 @@
 @echo off
 chcp 65001 > nul
-title Actualizador Diario - Trading Mineras de Oro (GOLD / NEM)
+title Actualizador Diario - Oro y Acciones
 
 :: 1. Fijar el directorio de trabajo al directorio donde se encuentra este archivo .bat
 cd /d "%~dp0"
 
 echo ==============================================================================
 echo   MOTOR DE BACKTESTING Y SEGUIMIENTO DIARIO DE MINERAS DE ORO
-echo   Activos: Barrick Gold (GOLD) y Newmont Corporation (NEM)
-echo   Operacion: 100%% Acciones al Contado - Cero Apalancamiento - Cero Rollover
+echo   Activos configurados: GOLD, NEM, MGC y BE
+echo   Seguimiento y simulacion con las reglas actuales del motor
 echo ==============================================================================
 echo.
 echo  Iniciando proceso automatizado de 1 clic...
 echo.
 
-:: 2. Detectar comando de Python disponible (python o py -3)
+:: 2. Priorizar el entorno virtual preparado para este proyecto.
+if exist ".venv\Scripts\python.exe" goto :use_venv
 set "PY_CMD=python"
-python --version >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    py -3 --version >nul 2>&1
-    if %ERRORLEVEL% EQU 0 (
-        set "PY_CMD=py -3"
-    ) else (
-        echo.
-        echo ==============================================================================
-        echo  [ERROR] No se encontro Python en el sistema ni en la variable PATH.
-        echo  Por favor instale Python 3.10+ y asegurese de marcar "Add Python to PATH".
-        echo ==============================================================================
-        echo.
-        pause
-        exit /b 1
-    )
-)
+python -c "import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)" >nul 2>&1
+if not errorlevel 1 goto :run_python
+set "PY_CMD=py -3"
+py -3 -c "import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)" >nul 2>&1
+if not errorlevel 1 goto :run_python
+echo [ERROR] Ejecuta scripts\setup.ps1 con Python 3.12 para preparar el entorno.
+pause
+exit /b 1
+
+:use_venv
+set "PY_CMD=.venv\Scripts\python.exe"
+
+:run_python
 
 :: 3. Ejecutar el script principal de actualizacion en Python
 %PY_CMD% actualizar_diario.py

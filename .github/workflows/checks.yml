@@ -1,0 +1,41 @@
+name: Offline backtesting checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.lock
+      - name: Install pinned environment
+        run: python -m pip install -r requirements.lock
+      - name: Install project
+        run: python -m pip install --no-deps --no-build-isolation -e .
+      - name: Check dependencies
+        run: python -m pip check
+      - name: Verify frozen historical inputs
+        run: python -m scripts.data_baseline
+      - name: Run both suites without network
+        run: python -m scripts.check --suite all --report artifacts/checks.json
+      - name: Build and verify installed wheel
+        run: python -m scripts.check_wheel
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checks-${{ matrix.os }}
+          path: artifacts/

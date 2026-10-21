@@ -6,3 +6,6 @@ build-test-deps/
 dist/
 .venv/
 .codex-test-deps/
+.pytest_cache/
+artifacts/
+*.log

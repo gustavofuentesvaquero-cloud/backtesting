@@ -1,0 +1,100 @@
+{
+  "format_version": 1,
+  "numeric_tolerance": {
+    "relative": 1e-10,
+    "absolute": 1e-10
+  },
+  "purpose": "Frozen regression fixtures; market provenance remains unverified.",
+  "provenance": {
+    "source": "legacy-local-cache",
+    "provider": null,
+    "price_adjustment": "unknown",
+    "downloaded_at": null
+  },
+  "limits": [
+    "Session calendar completeness is not checked.",
+    "Instrument identity and corporate actions require independent verification."
+  ],
+  "files": {
+    "BE_1d.parquet": {
+      "symbol": "BE",
+      "rows": 1254,
+      "first_date": "2021-10-18T00:00:00+00:00",
+      "last_date": "2026-10-15T00:00:00+00:00",
+      "sha256": "0a2ef9f79183868f21deccdc9ada68b63c0da59ab893a318afda332818dc3369",
+      "quality_checks": {
+        "invalid_dates": 0,
+        "duplicate_dates": 0,
+        "unordered_dates": 0,
+        "invalid_prices": 0,
+        "invalid_ohlc": 0,
+        "invalid_volume": 0,
+        "wrong_instrument": 0
+      }
+    },
+    "GOLD_1d.parquet": {
+      "symbol": "GOLD",
+      "rows": 1255,
+      "first_date": "2021-10-12T00:00:00+00:00",
+      "last_date": "2026-10-12T00:00:00+00:00",
+      "sha256": "3785bf2bd2eea1860d527ff24fcfe4bbfb4caddb566b1ff1b05a646745349e5b",
+      "quality_checks": {
+        "invalid_dates": 0,
+        "duplicate_dates": 0,
+        "unordered_dates": 0,
+        "invalid_prices": 0,
+        "invalid_ohlc": 0,
+        "invalid_volume": 0,
+        "wrong_instrument": 0
+      }
+    },
+    "IBE_1d.parquet": {
+      "symbol": "IBE",
+      "rows": 1279,
+      "first_date": "2021-10-18T00:00:00+00:00",
+      "last_date": "2026-10-16T00:00:00+00:00",
+      "sha256": "d0f0c1c3a1c610e6b71d2168afaace5e853e8e47141bbb8905c572a4e9f3b6c4",
+      "quality_checks": {
+        "invalid_dates": 0,
+        "duplicate_dates": 0,
+        "unordered_dates": 0,
+        "invalid_prices": 0,
+        "invalid_ohlc": 0,
+        "invalid_volume": 0,
+        "wrong_instrument": 0
+      }
+    },
+    "MGC_1d.parquet": {
+      "symbol": "MGC",
+      "rows": 501,
+      "first_date": "2024-10-14T00:00:00+00:00",
+      "last_date": "2026-10-12T00:00:00+00:00",
+      "sha256": "d51ace65507e054a900b15964ae2179ccf74475faa8f5aacee110af9a228f79b",
+      "quality_checks": {
+        "invalid_dates": 0,
+        "duplicate_dates": 0,
+        "unordered_dates": 0,
+        "invalid_prices": 0,
+        "invalid_ohlc": 0,
+        "invalid_volume": 0,
+        "wrong_instrument": 0
+      }
+    },
+    "NEM_1d.parquet": {
+      "symbol": "NEM",
+      "rows": 1255,
+      "first_date": "2021-10-12T00:00:00+00:00",
+      "last_date": "2026-10-12T00:00:00+00:00",
+      "sha256": "15c75892b8010aa3bfcbbcae8f55583d8456e7a445c05a0383b2919be1ed1366",
+      "quality_checks": {
+        "invalid_dates": 0,
+        "duplicate_dates": 0,
+        "unordered_dates": 0,
+        "invalid_prices": 0,
+        "invalid_ohlc": 0,
+        "invalid_volume": 0,
+        "wrong_instrument": 0
+      }
+    }
+  }
+}
