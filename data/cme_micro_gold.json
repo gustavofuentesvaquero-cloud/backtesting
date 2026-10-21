@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "instruments": [
+    {
+      "id": "MGC",
+      "asset_class": "future",
+      "venue": "COMEX",
+      "provider_symbols": [
+        {"provider_id": "IBKR", "symbol": "MGC"},
+        {"provider_id": "CME", "symbol": "MGC"},
+        {"provider_id": "YFINANCE", "symbol": "MGC=F"}
+      ],
+      "valid_from": "2024-01-01",
+      "valid_to": null,
+      "calendar_id": "CME-METALS-24H",
+      "price_tick": "0.10",
+      "price_precision": 2,
+      "quantity_unit": "contract",
+      "quantity_precision": 0,
+      "minimum_quantity": "1",
+      "quantity_increment": "1",
+      "quote_currency": "USD",
+      "valuation_model": "future_contract_multiplier",
+      "provenance": {
+        "status": "verified",
+        "sources": ["https://www.cmegroup.com/markets/metals/precious/micro-gold.contractSpecs.html"],
+        "notes": "Micro Gold Futures (MGC) on CME Globex/COMEX. Contract size: 10 troy ounces. Tick size: $0.10/oz ($1.00 per contract)."
+      },
+      "future_contract": {
+        "contract_code": "MGC-ACTIVE",
+        "contract_month": "2026-12",
+        "expiry_date": "2026-12-29",
+        "last_trade_date": "2026-12-28",
+        "first_notice_date": null,
+        "settlement_method": "cash",
+        "settlement_currency": "USD",
+        "contract_multiplier": "10"
+      }
+    }
+  ],
+  "calendars": [
+    {
+      "id": "CME-METALS-24H",
+      "timezone": "America/New_York",
+      "weekly_sessions": [
+        {
+          "start_weekday": 6,
+          "open_time": "18:00",
+          "close_time": "17:00",
+          "close_day_offset": 1,
+          "kind": "regular"
+        },
+        {
+          "start_weekday": 0,
+          "open_time": "18:00",
+          "close_time": "17:00",
+          "close_day_offset": 1,
+          "kind": "regular"
+        },
+        {
+          "start_weekday": 1,
+          "open_time": "18:00",
+          "close_time": "17:00",
+          "close_day_offset": 1,
+          "kind": "regular"
+        },
+        {
+          "start_weekday": 2,
+          "open_time": "18:00",
+          "close_time": "17:00",
+          "close_day_offset": 1,
+          "kind": "regular"
+        },
+        {
+          "start_weekday": 3,
+          "open_time": "18:00",
+          "close_time": "17:00",
+          "close_day_offset": 1,
+          "kind": "regular"
+        }
+      ],
+      "date_overrides": []
+    }
+  ],
+  "continuous_futures": []
+}

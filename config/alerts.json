@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "max_receive_silence_ns": null,
+  "queue_utilization_threshold": "0.90",
+  "quality_count_threshold": 1,
+  "recording_required": false,
+  "max_spread_by_instrument": {}
+}

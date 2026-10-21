@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/market-catalog/matching_policy.schema.json",
+  "title": "Versioned simulated matching policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "queue_model", "spread_model", "virtual_time_model", "latency", "slippage", "commission"],
+  "properties": {
+    "version": {"type": "string", "minLength": 1},
+    "queue_model": {"const": "conservative_l1_no_touch"},
+    "spread_model": {"const": "observed_l1_bid_ask"},
+    "virtual_time_model": {"const": "source_utc_then_receive_utc"},
+    "latency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "decision_to_arrival_ns"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "decision_to_arrival_ns": {"type": "integer", "minimum": 0}
+      }
+    },
+    "slippage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "ticks"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "ticks": {"type": "integer", "minimum": 0}
+      }
+    },
+    "commission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "per_unit", "notional_rate", "currency", "currency_precision", "rounding"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "per_unit": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+        "notional_rate": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+        "currency": {"anyOf": [{"type": "string", "pattern": "^[A-Z]{3}$"}, {"type": "null"}]},
+        "currency_precision": {"anyOf": [{"type": "integer", "minimum": 0, "maximum": 18}, {"type": "null"}]},
+        "rounding": {
+          "enum": ["ROUND_CEILING", "ROUND_DOWN", "ROUND_FLOOR", "ROUND_HALF_DOWN", "ROUND_HALF_EVEN", "ROUND_HALF_UP", "ROUND_UP"]
+        }
+      }
+    }
+  }
+}

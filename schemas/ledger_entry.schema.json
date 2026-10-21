@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/market-catalog/ledger_entry.schema.json",
+  "title": "Immutable portfolio ledger entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ledger_schema_version", "entry_id", "kind", "timestamp_ns", "arrival_ordinal",
+    "instrument_id", "currency", "amount", "quantity", "price", "cash_flows",
+    "realized_pnl", "fill", "conversion_rate", "bid_price", "ask_price", "provider_id",
+    "channel", "sequence", "source", "reference_id", "portfolio_version"
+  ],
+  "properties": {
+    "ledger_schema_version": {"const": "1.0.0"},
+    "entry_id": {"type": "string", "minLength": 1},
+    "kind": {"enum": ["fill", "commission", "cash_adjustment", "split", "dividend", "funding", "futures_settlement", "conversion_rate", "mark", "checkpoint"]},
+    "timestamp_ns": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+    "arrival_ordinal": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+    "instrument_id": {"$ref": "#/$defs/nullableString"},
+    "currency": {"$ref": "#/$defs/nullableCurrency"},
+    "amount": {"$ref": "#/$defs/nullableDecimal"},
+    "quantity": {"$ref": "#/$defs/nullableDecimal"},
+    "price": {"$ref": "#/$defs/nullableDecimal"},
+    "cash_flows": {"type": "array", "items": {"$ref": "#/$defs/cashFlow"}},
+    "realized_pnl": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/cashFlow"}]},
+    "fill": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/fill"}]},
+    "conversion_rate": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/conversionRate"}]},
+    "bid_price": {"$ref": "#/$defs/nullableDecimal"},
+    "ask_price": {"$ref": "#/$defs/nullableDecimal"},
+    "provider_id": {"$ref": "#/$defs/nullableString"},
+    "channel": {"$ref": "#/$defs/nullableString"},
+    "sequence": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+    "source": {"$ref": "#/$defs/nullableString"},
+    "reference_id": {"$ref": "#/$defs/nullableString"},
+    "portfolio_version": {"$ref": "#/$defs/nullableNonNegativeInteger"}
+  },
+  "$defs": {
+    "decimal": {"type": "string", "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+    "nullableDecimal": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/decimal"}]},
+    "nullableString": {"anyOf": [{"type": "null"}, {"type": "string"}]},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "nullableCurrency": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/currency"}]},
+    "nullableNonNegativeInteger": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 0}]},
+    "cashFlow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["currency", "amount", "category"],
+      "properties": {"currency": {"$ref": "#/$defs/currency"}, "amount": {"$ref": "#/$defs/decimal"}, "category": {"type": "string", "minLength": 1}}
+    },
+    "conversionRate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["from_currency", "to_currency", "rate", "timestamp_ns", "source", "arrival_ordinal", "instrument_id"],
+      "properties": {
+        "from_currency": {"$ref": "#/$defs/currency"}, "to_currency": {"$ref": "#/$defs/currency"},
+        "rate": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+        "timestamp_ns": {"type": "integer", "minimum": 0}, "source": {"type": "string", "minLength": 1},
+        "arrival_ordinal": {"$ref": "#/$defs/nullableNonNegativeInteger"}, "instrument_id": {"$ref": "#/$defs/nullableString"}
+      }
+    },
+    "fill": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "fill_id", "order_id", "instrument_id", "side", "quantity", "price", "currency", "arrival_ordinal",
+        "decision_ordinal", "decision_timestamp_ns", "order_arrival_timestamp_ns", "match_timestamp_ns", "bid_at_match",
+        "ask_at_match", "spread_at_match", "slippage", "commission", "commission_currency", "liquidity_source",
+        "matching_rule", "policy_version", "match_provider_id", "match_channel", "match_sequence",
+        "bid_quantity_at_match", "ask_quantity_at_match", "available_quantity_before_fill"
+      ],
+      "properties": {
+        "fill_id": {"type": "string", "minLength": 1}, "order_id": {"type": "string", "minLength": 1},
+        "instrument_id": {"type": "string", "minLength": 1}, "side": {"enum": ["buy", "sell"]},
+        "quantity": {"$ref": "#/$defs/decimal"}, "price": {"$ref": "#/$defs/decimal"},
+        "currency": {"$ref": "#/$defs/currency"}, "arrival_ordinal": {"type": "integer", "minimum": 0},
+        "decision_ordinal": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "decision_timestamp_ns": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "order_arrival_timestamp_ns": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "match_timestamp_ns": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "bid_at_match": {"$ref": "#/$defs/nullableDecimal"}, "ask_at_match": {"$ref": "#/$defs/nullableDecimal"},
+        "spread_at_match": {"$ref": "#/$defs/nullableDecimal"}, "slippage": {"$ref": "#/$defs/decimal"},
+        "commission": {"$ref": "#/$defs/decimal"}, "commission_currency": {"$ref": "#/$defs/nullableCurrency"},
+        "liquidity_source": {"type": "string", "minLength": 1}, "matching_rule": {"type": "string", "minLength": 1},
+        "policy_version": {"type": "string", "minLength": 1}, "match_provider_id": {"$ref": "#/$defs/nullableString"},
+        "match_channel": {"$ref": "#/$defs/nullableString"}, "match_sequence": {"$ref": "#/$defs/nullableNonNegativeInteger"},
+        "bid_quantity_at_match": {"$ref": "#/$defs/nullableDecimal"},
+        "ask_quantity_at_match": {"$ref": "#/$defs/nullableDecimal"},
+        "available_quantity_before_fill": {"$ref": "#/$defs/nullableDecimal"}
+      }
+    }
+  }
+}

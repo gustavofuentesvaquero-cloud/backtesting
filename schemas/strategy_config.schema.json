@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/market-catalog/strategy_config.schema.json",
+  "title": "Strategy configuration API 1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "strategy_id", "instance_id", "strategy_version", "parameters"],
+  "properties": {
+    "api_version": {"const": "1.0.0"},
+    "strategy_id": {"type": "string", "minLength": 1},
+    "instance_id": {"type": "string", "minLength": 1},
+    "strategy_version": {"type": "string", "minLength": 1},
+    "parameters": {
+      "type": "object",
+      "description": "Strategy-specific JSON parameters; implementations validate their own keys and ranges."
+    }
+  }
+}

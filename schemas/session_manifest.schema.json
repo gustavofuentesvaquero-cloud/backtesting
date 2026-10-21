@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/session_manifest.schema.json",
+  "title": "Market engine session manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_schema_version", "record_schema_version", "status", "replayable",
+    "session_id", "recording_mode", "engine_version", "runtime", "event_schema_version",
+    "ledger_schema_version", "catalog_schema_version", "catalog_version", "catalog",
+    "catalog_sha256", "configuration", "configuration_sha256", "engine_code_sha256",
+    "user_code_sha256", "strategy_instances", "seed", "feed_channels", "clock_policy",
+    "matching_policy", "portfolio_policy", "started_at_utc", "completed_at_utc",
+    "engine_status", "recording_queue", "recording_metrics", "incidents", "segments"
+  ],
+  "properties": {
+    "manifest_schema_version": {"const": "1.0.0"},
+    "record_schema_version": {"const": "1.0.0"},
+    "status": {"enum": ["recording", "complete", "incomplete"]},
+    "replayable": {"type": "boolean"},
+    "session_id": {"type": "string", "minLength": 1},
+    "recording_mode": {"enum": ["historical_replay", "live_simulation"]},
+    "engine_version": {"type": "string", "minLength": 1},
+    "runtime": {
+      "type": "object", "additionalProperties": false,
+      "required": ["python_implementation", "python_version", "platform", "jsonschema_version"],
+      "properties": {
+        "python_implementation": {"type": "string", "minLength": 1},
+        "python_version": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "jsonschema_version": {"type": ["string", "null"]}
+      }
+    },
+    "event_schema_version": {"type": "string", "minLength": 1},
+    "ledger_schema_version": {"type": "string", "minLength": 1},
+    "catalog_schema_version": {"type": "string", "minLength": 1},
+    "catalog_version": {"type": "string", "minLength": 1},
+    "catalog": {"type": "object"},
+    "catalog_sha256": {"$ref": "#/$defs/sha256"},
+    "configuration": {"type": "object"},
+    "configuration_sha256": {"$ref": "#/$defs/sha256"},
+    "engine_code_sha256": {"$ref": "#/$defs/sha256"},
+    "user_code_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+    "strategy_instances": {"type": "array", "items": {"type": "object"}},
+    "seed": {"type": ["integer", "null"], "minimum": 0},
+    "feed_channels": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["provider_id", "channel"],
+        "properties": {
+          "provider_id": {"type": "string", "minLength": 1},
+          "channel": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "clock_policy": {"enum": ["event_time", "controlled_step"]},
+    "matching_policy": {"type": "object"},
+    "portfolio_policy": {"type": "object"},
+    "started_at_utc": {"type": "string", "format": "date-time"},
+    "completed_at_utc": {"type": ["string", "null"], "format": "date-time"},
+    "engine_status": {"enum": ["running", "completed", "invalid", "aborted"]},
+    "recording_queue": {
+      "type": "object", "additionalProperties": false,
+      "required": ["capacity", "max_queue_wait_ns", "segment_max_records", "segment_max_bytes"],
+      "properties": {
+        "capacity": {"type": "integer", "minimum": 1},
+        "max_queue_wait_ns": {"type": ["integer", "null"], "minimum": 1},
+        "segment_max_records": {"type": "integer", "minimum": 1},
+        "segment_max_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "recording_metrics": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "queue_capacity": {"type": "integer", "minimum": 1},
+        "enqueued_records": {"type": "integer", "minimum": 0},
+        "written_records": {"type": "integer", "minimum": 0},
+        "dropped_records": {"type": "integer", "minimum": 0},
+        "pending_records": {"type": "integer", "minimum": 0},
+        "high_watermark": {"type": "integer", "minimum": 0},
+        "max_queue_wait_ns": {"type": "integer", "minimum": 0},
+        "max_write_ns": {"type": "integer", "minimum": 0},
+        "segment_count": {"type": "integer", "minimum": 0},
+        "writer_error": {"type": ["string", "null"]}
+      }
+    },
+    "incidents": {"type": "array", "items": {"type": "object"}},
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["file", "record_count", "bytes", "sha256"],
+        "properties": {
+          "file": {"type": "string", "pattern": "^segment-[0-9]{6}\\.jsonl$"},
+          "record_count": {"type": "integer", "minimum": 1},
+          "bytes": {"type": "integer", "minimum": 1},
+          "sha256": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

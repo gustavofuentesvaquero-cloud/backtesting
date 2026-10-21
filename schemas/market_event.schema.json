@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/market-catalog/market_event.schema.json",
+  "title": "Canonical market event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "provider_id",
+    "channel",
+    "instrument_id",
+    "event_type",
+    "source_timestamp_raw",
+    "source_timestamp_ns",
+    "timestamp_semantics",
+    "receive_time_utc_ns",
+    "receive_time_monotonic_ns",
+    "arrival_ordinal",
+    "sequence",
+    "sequence_scope",
+    "payload",
+    "quality_flags",
+    "decision_usable",
+    "book_state"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "provider_id": {"type": "string", "minLength": 1},
+    "channel": {"type": "string", "minLength": 1},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "event_type": {"type": "string", "enum": ["quote", "trade", "book_snapshot", "book_delta", "trading_status"]},
+    "source_timestamp_raw": {"type": ["string", "null"]},
+    "source_timestamp_ns": {"type": ["integer", "null"], "minimum": 0},
+    "timestamp_semantics": {"type": "string", "enum": ["event_time", "transaction_time", "publication_time", "unknown"]},
+    "receive_time_utc_ns": {"type": "integer", "minimum": 0},
+    "receive_time_monotonic_ns": {"type": "integer", "minimum": 0},
+    "arrival_ordinal": {"type": "integer", "minimum": 0},
+    "sequence": {"type": ["integer", "null"], "minimum": 0},
+    "sequence_scope": {"type": "string", "enum": ["instrument_channel", "channel", "provider", "unknown"]},
+    "payload": {"type": "object"},
+    "quality_flags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "enum": [
+        "timestamp_unverified",
+        "sequence_unavailable",
+        "missing_sequence",
+        "timestamp_semantics_changed",
+        "sequence_gap",
+        "sequence_duplicate",
+        "sequence_out_of_order",
+        "duplicate_payload",
+        "event_time_out_of_order",
+        "stale_source_timestamp",
+        "clock_skew",
+        "receive_time_out_of_order",
+        "sequence_scope_unverified",
+        "sequence_scope_changed",
+        "missing_source_timestamp",
+        "awaiting_snapshot",
+        "receive_silence_exceeded"
+      ]}
+    },
+    "decision_usable": {"type": "boolean"},
+    "book_state": {"type": "string", "enum": ["valid", "awaiting_snapshot", "not_applicable"]},
+    "raw_frame_b64": {"type": "string", "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"}
+  },
+  "$defs": {
+    "decimal": {"type": "string", "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"},
+    "positiveDecimal": {"type": "string", "pattern": "^(?!0(?:\\.0+)?$)(0|[1-9][0-9]*)(\\.[0-9]+)?$"},
+    "side": {"type": "string", "enum": ["bid", "ask"]},
+    "quoteSide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price", "quantity"],
+      "properties": {
+        "price": {"$ref": "#/$defs/decimal"},
+        "quantity": {"$ref": "#/$defs/positiveDecimal"}
+      }
+    },
+    "bookEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price", "quantity"],
+      "properties": {
+        "price": {"$ref": "#/$defs/decimal"},
+        "quantity": {"$ref": "#/$defs/positiveDecimal"},
+        "order_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "quotePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bid", "ask"],
+      "properties": {
+        "bid": {"$ref": "#/$defs/quoteSide"},
+        "ask": {"$ref": "#/$defs/quoteSide"}
+      }
+    },
+    "tradePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price", "quantity", "aggressor_side"],
+      "properties": {
+        "price": {"$ref": "#/$defs/decimal"},
+        "quantity": {"$ref": "#/$defs/positiveDecimal"},
+        "aggressor_side": {"type": "string", "enum": ["buy", "sell", "unknown"]}
+      }
+    },
+    "bookSnapshotPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["depth_type", "bids", "asks"],
+      "properties": {
+        "depth_type": {"type": "string", "enum": ["price_aggregated", "order_by_order"]},
+        "bids": {"type": "array", "items": {"$ref": "#/$defs/bookEntry"}},
+        "asks": {"type": "array", "items": {"$ref": "#/$defs/bookEntry"}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"depth_type": {"const": "order_by_order"}}, "required": ["depth_type"]},
+          "then": {
+            "properties": {
+              "bids": {"items": {"required": ["order_id"]}},
+              "asks": {"items": {"required": ["order_id"]}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"depth_type": {"const": "price_aggregated"}}, "required": ["depth_type"]},
+          "then": {
+            "properties": {
+              "bids": {"items": {"not": {"required": ["order_id"]}}},
+              "asks": {"items": {"not": {"required": ["order_id"]}}}
+            }
+          }
+        }
+      ]
+    },
+    "bookDeltaPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["depth_type", "action", "side", "price", "quantity"],
+      "properties": {
+        "depth_type": {"type": "string", "enum": ["price_aggregated", "order_by_order"]},
+        "action": {"type": "string", "enum": ["add", "update", "delete"]},
+        "side": {"$ref": "#/$defs/side"},
+        "price": {"$ref": "#/$defs/decimal"},
+        "quantity": {"oneOf": [{"$ref": "#/$defs/positiveDecimal"}, {"type": "null"}]},
+        "order_id": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"depth_type": {"const": "order_by_order"}}, "required": ["depth_type"]},
+          "then": {"required": ["order_id"]}
+        },
+        {
+          "if": {"properties": {"depth_type": {"const": "price_aggregated"}}, "required": ["depth_type"]},
+          "then": {"not": {"required": ["order_id"]}}
+        },
+        {
+          "if": {"properties": {"action": {"const": "delete"}}, "required": ["action"]},
+          "then": {"properties": {"quantity": {"type": "null"}}},
+          "else": {"properties": {"quantity": {"$ref": "#/$defs/positiveDecimal"}}}
+        }
+      ]
+    },
+    "tradingStatusPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"type": "string", "enum": ["open", "halted", "closed", "unknown"]},
+        "reason": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"event_type": {"const": "quote"}}, "required": ["event_type"]},
+      "then": {"properties": {"payload": {"$ref": "#/$defs/quotePayload"}}}
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "trade"}}, "required": ["event_type"]},
+      "then": {"properties": {"payload": {"$ref": "#/$defs/tradePayload"}}}
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "book_snapshot"}}, "required": ["event_type"]},
+      "then": {"properties": {"payload": {"$ref": "#/$defs/bookSnapshotPayload"}}}
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "book_delta"}}, "required": ["event_type"]},
+      "then": {"properties": {"payload": {"$ref": "#/$defs/bookDeltaPayload"}}}
+    },
+    {
+      "if": {"properties": {"event_type": {"const": "trading_status"}}, "required": ["event_type"]},
+      "then": {"properties": {"payload": {"$ref": "#/$defs/tradingStatusPayload"}}}
+    }
+  ]
+}

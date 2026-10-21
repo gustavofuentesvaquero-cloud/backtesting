@@ -1,0 +1,73 @@
+{
+  "dashboard_version": "1.0.0",
+  "title": "Market data and simulation health",
+  "panels": [
+    {
+      "title": "Connection and reception",
+      "metrics": [
+        "market.feed.connected",
+        "market.feed.frames_received",
+        "market.feed.last_receive_age_ns",
+        "market.feed.streams_stale",
+        "market.feed.books_awaiting_snapshot"
+      ]
+    },
+    {
+      "title": "Feed quality",
+      "metrics": [
+        "market.feed.sequence_gaps",
+        "market.feed.duplicates",
+        "market.feed.stale_events"
+      ]
+    },
+    {
+      "title": "Queue pressure and saturation",
+      "metrics": [
+        "market.engine.queue.utilization",
+        "market.engine.queue.rejected",
+        "market.engine.queue.pending",
+        "market.engine.queue.capacity"
+      ]
+    },
+    {
+      "title": "Stage latency and processing",
+      "metrics": [
+        "market.engine.stage.duration_ns.count",
+        "market.engine.stage.duration_ns.p99",
+        "market.engine.events.processed"
+      ]
+    },
+    {
+      "title": "Simulation, fills and P&L",
+      "metrics": [
+        "market.engine.fills",
+        "market.engine.orders",
+        "market.portfolio.realized_pnl",
+        "market.portfolio.unrealized_pnl",
+        "market.portfolio.version",
+        "market.portfolio.ledger_entries"
+      ]
+    },
+    {
+      "title": "Recording state",
+      "metrics": [
+        "market.recording.records_written",
+        "market.recording.records_dropped",
+        "market.recording.queue.pending",
+        "market.recording.complete"
+      ]
+    }
+  ],
+  "alert_codes": [
+    "feed_disconnected",
+    "feed_no_data",
+    "feed_data_stale",
+    "feed_sequence_gap",
+    "feed_duplicate",
+    "book_awaiting_snapshot",
+    "engine_queue_saturated",
+    "recording_incomplete",
+    "spread_anomalous",
+    "replay_divergence"
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/market-catalog/market_catalog.schema.json",
+  "title": "Market catalog",
+  "description": "Language-neutral catalog for instruments, calendars and non-executable continuous futures series.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "catalog_version",
+    "instruments",
+    "calendars",
+    "continuous_futures"
+  ],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "catalog_version": {"type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"},
+    "instruments": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/instrument"}
+    },
+    "calendars": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/calendar"}
+    },
+    "continuous_futures": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/continuousFuture"}
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Three-letter uppercase currency code. The schema checks shape, not membership in a current currency registry."
+    },
+    "decimalString": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+      "description": "Non-negative base-10 decimal encoded as a string to preserve exactness."
+    },
+    "session": {
+      "allOf": [{"$ref": "#/$defs/sessionFields"}],
+      "unevaluatedProperties": false
+    },
+    "weeklySession": {
+      "allOf": [
+        {"$ref": "#/$defs/sessionFields"},
+        {
+          "type": "object",
+          "required": ["start_weekday"],
+          "properties": {"start_weekday": {"type": "integer", "minimum": 0, "maximum": 6}}
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "sessionFields": {
+      "type": "object",
+      "required": ["open_time", "close_time", "close_day_offset", "kind"],
+      "properties": {
+        "open_time": {"type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"},
+        "close_time": {"type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"},
+        "close_day_offset": {"type": "integer", "enum": [0, 1]},
+        "kind": {"type": "string", "enum": ["regular", "extraordinary"]}
+      }
+    },
+    "dateOverride": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "status", "sessions"],
+      "properties": {
+        "date": {"type": "string", "format": "date"},
+        "status": {"type": "string", "enum": ["closed", "override"]},
+        "sessions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/session"}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "closed"}}, "required": ["status"]},
+          "then": {"properties": {"sessions": {"maxItems": 0}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "override"}}, "required": ["status"]},
+          "then": {"properties": {"sessions": {"minItems": 1}}}
+        }
+      ]
+    },
+    "calendar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "timezone", "weekly_sessions", "date_overrides"],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "timezone": {"type": "string", "minLength": 1},
+        "weekly_sessions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/weeklySession"}
+        },
+        "date_overrides": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/dateOverride"}
+        }
+      }
+    },
+    "providerSymbol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_id", "symbol"],
+      "properties": {
+        "provider_id": {"$ref": "#/$defs/identifier"},
+        "symbol": {"type": "string", "minLength": 1, "maxLength": 128}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "sources", "notes"],
+      "properties": {
+        "status": {"type": "string", "enum": ["verified", "unverified", "synthetic"]},
+        "sources": {"type": "array", "items": {"type": "string", "format": "uri"}},
+        "notes": {"type": "string"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "verified"}}, "required": ["status"]},
+          "then": {"properties": {"sources": {"minItems": 1}}}
+        }
+      ]
+    },
+    "equityHistoryPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price_basis", "corporate_action_events"],
+      "properties": {
+        "price_basis": {"type": "string", "enum": ["raw", "split_adjusted", "total_return_adjusted"]},
+        "corporate_action_events": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "enum": ["split", "dividend", "special_distribution"]}
+        }
+      }
+    },
+    "fxConvention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_currency", "pip_size", "pip_value_currency", "pip_value_rule"],
+      "properties": {
+        "base_currency": {"$ref": "#/$defs/currency"},
+        "pip_size": {"$ref": "#/$defs/decimalString"},
+        "pip_value_currency": {"$ref": "#/$defs/currency"},
+        "pip_value_rule": {
+          "type": "string",
+          "const": "base_quantity_times_pip_size_in_quote_currency"
+        }
+      }
+    },
+    "futureContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_code",
+        "contract_month",
+        "expiry_date",
+        "last_trade_date",
+        "settlement_method",
+        "settlement_currency",
+        "contract_multiplier"
+      ],
+      "properties": {
+        "contract_code": {"type": "string", "minLength": 1},
+        "contract_month": {"type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"},
+        "expiry_date": {"type": "string", "format": "date"},
+        "last_trade_date": {"type": "string", "format": "date"},
+        "first_notice_date": {"type": ["string", "null"], "format": "date"},
+        "settlement_method": {"type": "string", "enum": ["cash", "physical"]},
+        "settlement_currency": {"$ref": "#/$defs/currency"},
+        "contract_multiplier": {"$ref": "#/$defs/decimalString"}
+      }
+    },
+    "instrument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "asset_class",
+        "venue",
+        "provider_symbols",
+        "valid_from",
+        "calendar_id",
+        "price_tick",
+        "price_precision",
+        "quantity_unit",
+        "quantity_precision",
+        "minimum_quantity",
+        "quantity_increment",
+        "quote_currency",
+        "valuation_model",
+        "provenance"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "asset_class": {"type": "string", "enum": ["equity", "fx", "future"]},
+        "venue": {"type": "string", "minLength": 1},
+        "provider_symbols": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/providerSymbol"}
+        },
+        "valid_from": {"type": "string", "format": "date"},
+        "valid_to": {"type": ["string", "null"], "format": "date"},
+        "calendar_id": {"$ref": "#/$defs/identifier"},
+        "price_tick": {"$ref": "#/$defs/decimalString"},
+        "price_precision": {"type": "integer", "minimum": 0, "maximum": 18},
+        "quantity_unit": {"type": "string", "enum": ["share", "base_currency_unit", "contract"]},
+        "quantity_precision": {"type": "integer", "minimum": 0, "maximum": 18},
+        "minimum_quantity": {"$ref": "#/$defs/decimalString"},
+        "quantity_increment": {"$ref": "#/$defs/decimalString"},
+        "quote_currency": {"$ref": "#/$defs/currency"},
+        "valuation_model": {
+          "type": "string",
+          "enum": ["equity_shares", "fx_base_units", "future_contract_multiplier"]
+        },
+        "provenance": {"$ref": "#/$defs/provenance"},
+        "historical_price_policy": {"$ref": "#/$defs/equityHistoryPolicy"},
+        "fx_convention": {"$ref": "#/$defs/fxConvention"},
+        "future_contract": {"$ref": "#/$defs/futureContract"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"asset_class": {"const": "equity"}}, "required": ["asset_class"]},
+          "then": {
+            "properties": {
+              "valuation_model": {"const": "equity_shares"},
+              "quantity_unit": {"const": "share"}
+            },
+            "required": ["historical_price_policy"],
+            "not": {"anyOf": [{"required": ["fx_convention"]}, {"required": ["future_contract"]}]}
+          }
+        },
+        {
+          "if": {"properties": {"asset_class": {"const": "fx"}}, "required": ["asset_class"]},
+          "then": {
+            "properties": {
+              "valuation_model": {"const": "fx_base_units"},
+              "quantity_unit": {"const": "base_currency_unit"}
+            },
+            "required": ["fx_convention"],
+            "not": {"anyOf": [{"required": ["historical_price_policy"]}, {"required": ["future_contract"]}]}
+          }
+        },
+        {
+          "if": {"properties": {"asset_class": {"const": "future"}}, "required": ["asset_class"]},
+          "then": {
+            "properties": {
+              "valuation_model": {"const": "future_contract_multiplier"},
+              "quantity_unit": {"const": "contract"}
+            },
+            "required": ["future_contract"],
+            "not": {"anyOf": [{"required": ["historical_price_policy"]}, {"required": ["fx_convention"]}]}
+          }
+        }
+      ]
+    },
+    "continuousFuture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "instrument_ids", "executable", "roll_policy", "adjustment_method", "provenance"],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "instrument_ids": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/identifier"}
+        },
+        "executable": {"const": false},
+        "roll_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method"],
+          "properties": {
+            "method": {"type": "string", "enum": ["calendar_date", "days_before_expiry", "volume_crossover", "open_interest_crossover"]},
+            "roll_before_expiry_days": {"type": "integer", "minimum": 1}
+          },
+          "allOf": [
+            {
+              "if": {"properties": {"method": {"const": "days_before_expiry"}}, "required": ["method"]},
+              "then": {"required": ["roll_before_expiry_days"]}
+            },
+            {
+              "if": {"properties": {"method": {"enum": ["calendar_date", "volume_crossover", "open_interest_crossover"]}}, "required": ["method"]},
+              "then": {"not": {"required": ["roll_before_expiry_days"]}}
+            }
+          ]
+        },
+        "adjustment_method": {"type": "string", "enum": ["none", "back_adjusted_difference", "ratio_adjusted"]},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    }
+  }
+}

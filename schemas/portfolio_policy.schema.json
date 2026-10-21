@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/market-catalog/portfolio_policy.schema.json",
+  "title": "Versioned portfolio accounting policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "mark_model", "reporting_currency", "max_conversion_age_ns", "exposure_limits", "margin_rules"],
+  "properties": {
+    "version": {"type": "string", "minLength": 1},
+    "mark_model": {"const": "conservative_l1_bid_for_longs_ask_for_shorts"},
+    "reporting_currency": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[A-Z]{3}$"}]},
+    "max_conversion_age_ns": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 0}]},
+    "exposure_limits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["scope", "key", "max_abs_notional"],
+        "properties": {
+          "scope": {"enum": ["instrument", "currency"]},
+          "key": {"type": "string", "minLength": 1},
+          "max_abs_notional": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"}
+        }
+      }
+    },
+    "margin_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["instrument_id", "model", "initial_requirement", "maintenance_requirement", "currency"],
+        "properties": {
+          "instrument_id": {"type": "string", "minLength": 1},
+          "model": {"enum": ["per_unit", "notional_rate"]},
+          "initial_requirement": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+          "maintenance_requirement": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"},
+          "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}
+        }
+      }
+    }
+  }
+}

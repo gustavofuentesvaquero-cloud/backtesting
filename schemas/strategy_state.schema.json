@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/market-catalog/strategy_state.schema.json",
+  "title": "Strategy state snapshot 1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "snapshot_version", "api_version", "strategy_id", "instance_id",
+    "strategy_version", "config_sha256", "seed", "rng_algorithm", "callback_count", "state", "rng_state"
+  ],
+  "properties": {
+    "snapshot_version": {"const": "1.0.0"},
+    "api_version": {"const": "1.0.0"},
+    "strategy_id": {"type": "string", "minLength": 1},
+    "instance_id": {"type": "string", "minLength": 1},
+    "strategy_version": {"type": "string", "minLength": 1},
+    "config_sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+    "seed": {"type": "integer", "minimum": 0},
+    "rng_algorithm": {"const": "python.random.Random"},
+    "callback_count": {"type": "integer", "minimum": 0},
+    "state": {"type": "object"},
+    "rng_state": {"type": "array"}
+  }
+}

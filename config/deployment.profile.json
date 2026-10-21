@@ -1,0 +1,15 @@
+{
+  "profile_version": "1.0.0",
+  "live_execution_enabled": false,
+  "execution_adapter": null,
+  "outbound_network": {
+    "default_policy": "deny",
+    "allowed_hosts": []
+  },
+  "credentials": {
+    "source": "external_secret_manager",
+    "permissions": ["market_data.read"],
+    "redact_from_logs": true,
+    "secrets_in_config": false
+  }
+}

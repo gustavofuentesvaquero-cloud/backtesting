@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/market-catalog/deployment-profile.schema.json",
+  "title": "Simulation-only deployment profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile_version", "live_execution_enabled", "execution_adapter", "outbound_network", "credentials"],
+  "properties": {
+    "profile_version": {"type": "string", "minLength": 1},
+    "live_execution_enabled": {"const": false},
+    "execution_adapter": {"type": ["string", "null"]},
+    "outbound_network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_policy", "allowed_hosts"],
+      "properties": {
+        "default_policy": {"enum": ["deny", "allow"]},
+        "allowed_hosts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "credentials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "permissions", "redact_from_logs", "secrets_in_config"],
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "permissions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "redact_from_logs": {"type": "boolean"},
+        "secrets_in_config": {"type": "boolean"}
+      }
+    }
+  }
+}

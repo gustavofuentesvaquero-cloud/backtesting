@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "market-catalog"
+version = "0.1.0"
+description = "Versioned market instrument and calendar catalog for a backtesting engine"
+requires-python = ">=3.11"
+dependencies = ["jsonschema>=4.18,<5"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.data-files]
+"share/market-catalog/schemas" = ["schemas/market_catalog.schema.json", "schemas/market_event.schema.json", "schemas/strategy_config.schema.json", "schemas/strategy_state.schema.json", "schemas/matching_policy.schema.json", "schemas/portfolio_policy.schema.json", "schemas/ledger_entry.schema.json", "schemas/session_manifest.schema.json", "schemas/session_record.schema.json", "schemas/deployment_profile.schema.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
