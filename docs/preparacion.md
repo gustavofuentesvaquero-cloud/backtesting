@@ -20,6 +20,7 @@ Se utiliza como raíz del paquete la carpeta superior a `docs`, que contiene `py
 | Casos sintéticos del motor | `tests/unit/test_backtest_engine.py` | Operación calculada a mano, costes, gap en stop, doble toque, calentamiento, repetibilidad e invariancia de un prefijo sin zonas |
 | Históricos de regresión independientes de la caché | `tests/fixtures/historical` | Cinco Parquet copiados sin cambios, manifiesto y SHA-256 |
 | Congelación y verificación de históricos | `scripts/data_baseline.py` | Casos de manipulación, archivos ausentes, datos inválidos y rechazo de sobrescritura |
+| Conjunto inicial con identidad y procedencia verificadas | `data/frozen/nyse-equities-2024-v1`, `scripts/equity_dataset.py` | BE y NEM, 252 sesiones de 2024 por acción; originales Yahoo, calendario NYSE y comparación exacta con Parquet; véase [evidencia](datos-iniciales-acciones.md) |
 | Regresiones históricas separadas | `tests/integration` | Mismos casos existentes, aplicados a copias congeladas |
 | Verificación de instalación del wheel | `scripts/check_wheel.py` | Entorno limpio fuera del repositorio, importación y validaciones de catálogo, despliegue y alertas |
 | Automatización de verificaciones | `.githooks/pre-commit`, `scripts/check_staged.py`, `.github/workflows/checks.yml` | Hook local activo y probado; cuatro trabajos CI configurados para Windows/Linux; remoto `origin` conectado a GitHub |
@@ -28,7 +29,7 @@ Se utiliza como raíz del paquete la carpeta superior a `docs`, que contiene `py
 ## Evidencia local
 
 - Antes de separar las pruebas, la suite original ejecutó **113 casos**, todos correctos.
-- La referencia actual ejecuta **121 casos unitarios y 12 históricos**, **133 en total**, sin errores ni casos omitidos. Incluye cuatro casos de aislamiento y tres del control de commits preparados.
+- La referencia actual ejecuta **131 casos unitarios y 14 históricos**, **145 en total**, sin errores ni casos omitidos. Incluye cuatro casos de aislamiento, tres del control de commits preparados y doce del conjunto inicial identificado.
 - La instalación del wheel se comprobó en otro entorno virtual sin acceso al código fuente por `PYTHONPATH`, usando dependencias locales y sin descargar cotizaciones. Esta comprobación motivó corregir la búsqueda del esquema de despliegue en una instalación normal.
 - Los cinco históricos congelados pasan los controles estructurales de fechas, OHLC, volumen e identificador. Se registra una tolerancia numérica de `1e-10` absoluta y relativa para diferencias de coma flotante en los límites OHLC.
 - `pip check` no detecta dependencias incompatibles. Se verificaron en entornos limpios los 18 paquetes del núcleo y los 35 de la variante de descarga, comprobando cada versión frente a su lock. Los paquetes compartidos tienen versiones idénticas en ambos archivos. yfinance se importa correctamente; no se ha comprobado su servicio remoto.
@@ -45,7 +46,7 @@ La separación explícita utiliza `tests/unit` y `tests/integration`. `scripts.c
 
 La [automatización](automatizacion-pruebas.md) añade un hook local verificado y los informes `automation-tests.json` y `workflow-audit.json`. Las pruebas de integración y las unitarias conservan trabajos independientes aunque falle otra combinación de la matriz. GitHub Actions está configurado y el remoto `origin` apunta a `https://github.com/gustavofuentesvaquero-cloud/backtesting.git`. Los resultados remotos se consultan en la pestaña Actions del repositorio.
 
-Antes de editar se guardaron 86 archivos originales en `artifacts/preparation/before-preparation.zip`, acompañados por `before-preparation.sha256.json`. Esa copia verificada se registró como primer commit local del repositorio interior: `a94f6b6` (`chore: snapshot imported backtesting project before preparation`). El estado preparado se guarda en el commit identificado por la etiqueta local `before-directory-reorganization`; la [decisión de raíz](raiz-proyecto.md) explica cómo comprobarlo. El registro es local, sin publicación del repositorio ni de los datos.
+Antes de editar se guardaron 86 archivos originales en `artifacts/preparation/before-preparation.zip`, acompañados por `before-preparation.sha256.json`. Esa copia verificada se registró como primer commit local del repositorio interior: `a94f6b6` (`chore: snapshot imported backtesting project before preparation`). El estado preparado se guarda en el commit identificado por la etiqueta `before-directory-reorganization`; la [decisión de raíz](raiz-proyecto.md) explica cómo comprobarlo. El historial y esa etiqueta se publicaron posteriormente al conectar el repositorio GitHub indicado por el usuario.
 
 ## Repetir la verificación
 
@@ -70,4 +71,4 @@ Para cambiar una referencia histórica, crear otra carpeta con `scripts.data_bas
 5. Compartir las reglas de señal entre motor histórico y seguimiento diario.
 6. Después de cerrar esos puntos, ejecutar comparaciones con fechas y costes comunes y periodos reservados para evaluación.
 
-Los tests de regresión no prueban estos requisitos completos. El caso de invariancia nuevo cubre un escenario concreto sin zonas de control. La procedencia financiera, las acciones corporativas, los calendarios y el rollover de futuros todavía requieren verificación antes de aceptar los datos para investigación comparativa.
+Los tests de regresión no prueban estos requisitos completos. El caso de invariancia nuevo cubre un escenario concreto sin zonas de control. BE y NEM en 2024 disponen ya de identidad, procedencia y sesiones verificadas según el [contrato del conjunto inicial](datos-iniciales-acciones.md). La contabilidad de acciones corporativas en el motor, las demás series y el rollover de futuros siguen pendientes antes de la investigación comparativa.

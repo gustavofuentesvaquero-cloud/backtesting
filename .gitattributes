@@ -14,3 +14,4 @@
 *.parquet binary
 *.xlsx binary
 *.zip binary
+data/frozen/** -text

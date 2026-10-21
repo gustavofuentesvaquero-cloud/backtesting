@@ -40,7 +40,7 @@ Esfuerzo orientativo: 1–2 días de desarrollo.
 
 Esfuerzo orientativo: 2–3 días.
 
-1. Congelar un conjunto de datos inicial para dos acciones del catálogo, después de verificar su identidad e histórico.
+1. Congelar un conjunto de datos inicial para dos acciones del catálogo, después de verificar su identidad e histórico. Completado para BE y NEM en 2024: [conjunto inicial y evidencia](datos-iniciales-acciones.md), con 252 sesiones por acción, fuentes de identidad, originales del proveedor y verificación sin red. Las regresiones heredadas permanecen separadas.
 2. Guardar procedencia, identificador del instrumento, símbolo del proveedor, fechas, zona horaria, fecha de descarga, política de ajustes y checksum.
 3. Validar fechas únicas y ordenadas, valores finitos, coherencia OHLC, volumen y sesiones esperadas. Diferenciar cierres de mercado de datos ausentes.
 4. Decidir explícitamente cómo tratar splits y dividendos, y evitar contabilizarlos dos veces.

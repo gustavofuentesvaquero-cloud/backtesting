@@ -1,0 +1,4 @@
+{
+  "requested_url": "https://query1.finance.yahoo.com/v8/finance/chart/NEM?period1=1704067200&period2=1735689600&interval=1d&events=div%2Csplits&includeAdjustedClose=true",
+  "retrieved_at_utc": "2026-10-21T12:23:00.650681+00:00"
+}

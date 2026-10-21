@@ -58,6 +58,7 @@ Los siguientes comandos suponen que `python` es el del entorno virtual; en Windo
 ```console
 python -m scripts.check --suite unit
 python -m scripts.data_baseline
+python -m scripts.equity_dataset
 python -m scripts.check --suite historical
 python -m scripts.check --suite all --report artifacts/preparation/checks.json
 ```
@@ -65,7 +66,8 @@ python -m scripts.check --suite all --report artifacts/preparation/checks.json
 - Las pruebas unitarias están en `tests/unit` y usan escenarios sintéticos y directorios temporales. El ejecutor rechaza almacenes implícitos y almacenes que apunten a los directorios de datos operativos o históricos congelados.
 - Las pruebas de integración están en `tests/integration` y usan copias congeladas en `tests/fixtures/historical`, con hashes, fechas únicas y ordenadas, precios finitos y positivos, coherencia OHLC, volumen e identificador comprobados. Sus almacenes deben apuntar a ese directorio.
 - `data/historical` sigue siendo la caché operativa; actualizarla no cambia las regresiones.
-- El manifiesto reconoce que faltan verificar proveedor, ajustes corporativos y completitud del calendario. Congelar datos garantiza una referencia estable, no su autenticidad financiera.
+- El manifiesto de las regresiones heredadas reconoce que faltan verificar proveedor, ajustes corporativos y completitud del calendario. Esas regresiones se conservan como referencia del comportamiento anterior.
+- El conjunto inicial verificado de **BE y NEM, año 2024**, está separado en `data/frozen/nyse-equities-2024-v1`: 252 sesiones por acción, identidad contrastada con fuentes de los emisores, respuesta original de Yahoo, calendario NYSE, política de ajustes y hashes. `scripts.equity_dataset` lo verifica sin red; véase [datos iniciales](docs/datos-iniciales-acciones.md). Las pruebas de integración verifican también este conjunto, sin acceder a la caché operativa.
 - El ejecutor bloquea las APIs de conexión y DNS de Python, los envíos UDP y los métodos de descarga del almacén, desde la importación y el descubrimiento de pruebas. Los errores y los casos omitidos hacen fallar la comprobación.
 - `scripts.check --suite unit` y `--suite historical` descubren cada grupo de forma explícita; `--suite all` cubre ambos. El descubrimiento directo con `unittest` no activa esas protecciones, por lo que los comandos anteriores son la forma recomendada de ejecución.
 

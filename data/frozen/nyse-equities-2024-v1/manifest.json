@@ -1,0 +1,120 @@
+{
+  "format_version": 1,
+  "dataset_id": "nyse-equities-2024-v1",
+  "frozen_at_utc": "2026-10-21T12:45:39.248718+00:00",
+  "period": {
+    "start_inclusive": "2024-01-01",
+    "end_exclusive": "2025-01-01"
+  },
+  "expected_sessions_per_instrument": 252,
+  "policy": {
+    "ohlc": "Yahoo quote OHLC, split-adjusted by provider; no dividend adjustment applied by this pipeline",
+    "adjusted_close": "Yahoo adjclose retained for audit only; never substituted for close",
+    "dividends": "USD per share on provider ex-date; preserved, not credited by this pipeline",
+    "splits": "No splits reported in this sample; reject a source that reports any, pending explicit handling",
+    "date": "UTC scheduled session close; session_date is the NYSE local trading date",
+    "source_timestamp": "Yahoo daily timestamp must match 09:30 America/New_York",
+    "availability": "Scheduled close is a bar label, not a guarantee of provider publication time; trade no earlier than next session",
+    "missing_sessions": "Reject; do not fill or interpolate",
+    "rounding": "Preserve provider floating point values without rounding"
+  },
+  "identity_verification": "Issuer/SEC sources reviewed; chart metadata and catalog checked on freezing",
+  "historical_verification": "Exact source-to-Parquet equality, structural checks and complete NYSE sessions",
+  "limits": [
+    "Single price provider; prices are not independently certified against exchange trades.",
+    "Downloaded vintage, not a point-in-time archive; adjusted close may reflect later actions.",
+    "Dividend events use ex-dates, not cash payment dates; total-return accounting remains separate.",
+    "Two selected surviving instruments and one year are an initial technical sample, not an unbiased universe."
+  ],
+  "instruments": {
+    "BE": {
+      "name": "Bloom Energy Corporation",
+      "cik": "0001664703",
+      "share_class": "Class A common stock",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/1664703/000162828025008747/be-20241231.htm"
+      ],
+      "venue": "XNYS",
+      "currency": "USD",
+      "provider": "Yahoo Finance chart v8",
+      "provider_symbol": "BE",
+      "retrieved_at_utc": "2026-10-21T12:23:00.521028+00:00",
+      "quality": {
+        "symbol": "BE",
+        "rows": 252,
+        "first_date": "2024-01-02T21:00:00+00:00",
+        "last_date": "2024-12-31T21:00:00+00:00",
+        "sha256": "72f98dcfd536be4b3b7dffc45153167cc25f5194d986e78e41a94149eaf04fa2",
+        "quality_checks": {
+          "invalid_dates": 0,
+          "duplicate_dates": 0,
+          "unordered_dates": 0,
+          "invalid_prices": 0,
+          "invalid_ohlc": 0,
+          "invalid_volume": 0,
+          "wrong_instrument": 0
+        }
+      },
+      "dividends": [],
+      "splits_reported": 0
+    },
+    "NEM": {
+      "name": "Newmont Corporation",
+      "cik": "0001164727",
+      "share_class": "Common stock",
+      "sources": [
+        "https://investors.newmont.com/investors/news-release/news-details/2025/Newmont-Reports-Fourth-Quarter-and-Full-Year-2024-Results-Provides-Full-Year-2025-Guidance/default.aspx"
+      ],
+      "venue": "XNYS",
+      "currency": "USD",
+      "provider": "Yahoo Finance chart v8",
+      "provider_symbol": "NEM",
+      "retrieved_at_utc": "2026-10-21T12:23:00.650681+00:00",
+      "quality": {
+        "symbol": "NEM",
+        "rows": 252,
+        "first_date": "2024-01-02T21:00:00+00:00",
+        "last_date": "2024-12-31T21:00:00+00:00",
+        "sha256": "efe9e5e5edc5f82e415b0cf80cd613d49fe80a9529f38e476fc4d77671503bc8",
+        "quality_checks": {
+          "invalid_dates": 0,
+          "duplicate_dates": 0,
+          "unordered_dates": 0,
+          "invalid_prices": 0,
+          "invalid_ohlc": 0,
+          "invalid_volume": 0,
+          "wrong_instrument": 0
+        }
+      },
+      "dividends": [
+        {
+          "session_date": "2024-03-04",
+          "dividend": 0.25
+        },
+        {
+          "session_date": "2024-06-04",
+          "dividend": 0.25
+        },
+        {
+          "session_date": "2024-09-05",
+          "dividend": 0.25
+        },
+        {
+          "session_date": "2024-11-27",
+          "dividend": 0.25
+        }
+      ],
+      "splits_reported": 0
+    }
+  },
+  "files": {
+    "BE_1d.parquet": "72f98dcfd536be4b3b7dffc45153167cc25f5194d986e78e41a94149eaf04fa2",
+    "calendar.json": "17e0d0ddc1cb3707ef193f62a0c46df8cb563f9c452b28269966385b64b5ebf4",
+    "catalog.json": "1d320a3da70a3f1e76630c27d9b9eac2f20d99c81311c23502de4e6cd4a1ea49",
+    "NEM_1d.parquet": "efe9e5e5edc5f82e415b0cf80cd613d49fe80a9529f38e476fc4d77671503bc8",
+    "source/BE.json": "23882492e1e29d2f781113590c7f9b7acce3708811ca374fab2f389385cc1259",
+    "source/BE.receipt.json": "eb63c038bd3d7bbb0cb4efff473fa84b093986886bf127b18007b1961032ec5f",
+    "source/NEM.json": "99b7ea0053a397a72fd295b78eae54eeacb4d18aed5c13f878d77a30efe3dec3",
+    "source/NEM.receipt.json": "165be9f2afd7567b8ef9c4e71a4d8d0afb43426cf6a5f7b709ce654902a81239"
+  }
+}

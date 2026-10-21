@@ -34,6 +34,9 @@ jobs:
       - name: Verify frozen historical inputs
         if: matrix.suite == 'historical'
         run: python -m scripts.data_baseline
+      - name: Verify identified equity dataset
+        if: matrix.suite == 'historical'
+        run: python -m scripts.equity_dataset
       - name: Run selected suite without network
         run: python -m scripts.check --suite ${{ matrix.suite }} --report artifacts/checks.json
       - name: Build and verify installed wheel

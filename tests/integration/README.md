@@ -1,6 +1,6 @@
 # Pruebas históricas
 
-Estos casos usan exclusivamente los Parquet congelados de `tests/fixtures/historical`, comprobados contra su manifiesto antes de abrirlos. No leen `data/historical` ni descargan cotizaciones.
+Las regresiones heredadas usan los Parquet congelados de `tests/fixtures/historical`, comprobados contra su manifiesto antes de abrirlos. `test_equity_dataset.py` verifica además el conjunto identificado de BE y NEM en `data/frozen/nyse-equities-2024-v1`, reconstruyendo las barras desde la respuesta original de Yahoo y contrastando todas las sesiones con el calendario NYSE de 2024. No leen `data/historical` ni descargan cotizaciones.
 
 Ejecutar desde la raíz del paquete:
 

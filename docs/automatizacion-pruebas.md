@@ -39,14 +39,14 @@ La matriz contiene cuatro trabajos independientes con Python 3.12:
 | Linux | Unitarias |
 | Linux | Integración histórica |
 
-Cada trabajo instala las versiones de `requirements.lock`, instala el proyecto y ejecuta `pip check`. Las unitarias se ejecutan sin depender de los históricos; la integración verifica primero los cinco archivos congelados. Los trabajos unitarios también construyen y comprueban el wheel instalado.
+Cada trabajo instala las versiones de `requirements.lock`, instala el proyecto y ejecuta `pip check`. Las unitarias se ejecutan sin depender de los históricos; la integración verifica primero los cinco archivos de regresión congelados y el conjunto identificado de BE y NEM de 2024. Los trabajos unitarios también construyen y comprueban el wheel instalado.
 
 `fail-fast: false` permite que los otros trabajos terminen aunque uno falle. No se permite ignorar errores. Cada trabajo tiene un límite de 20 minutos y publica sus artefactos incluso si falla, con un nombre distinto para cada combinación de sistema y grupo.
 
 ## Estado comprobado
 
 - Hook activado en el repositorio interior elegido como raíz del proyecto y ejecutado correctamente con `git hook run pre-commit`.
-- Suite del árbol de trabajo: **121 unitarias y 12 históricas**, **133 casos correctos**. Los tres casos nuevos verifican el comportamiento del control sobre contenido preparado, cambios sin preparar y ausencia del ejecutor en el índice.
+- Al implantar el hook: **121 unitarias y 12 históricas**, **133 casos correctos**. Tres casos verifican el comportamiento del control sobre contenido preparado, cambios sin preparar y ausencia del ejecutor en el índice. La entrega posterior del [conjunto inicial de acciones](datos-iniciales-acciones.md) amplía la suite a **131 unitarias y 14 históricas**, **145 casos correctos**.
 - YAML analizado y comprobado: disparadores, matriz de cuatro combinaciones, propagación de fallos y publicación de artefactos.
 - El remoto `origin` está conectado a [gustavofuentesvaquero-cloud/backtesting](https://github.com/gustavofuentesvaquero-cloud/backtesting), con rama principal `main`. Cada push dispara el workflow; consultar los resultados de cada commit en [GitHub Actions](https://github.com/gustavofuentesvaquero-cloud/backtesting/actions). La evidencia local anterior no sustituye el resultado remoto.
 

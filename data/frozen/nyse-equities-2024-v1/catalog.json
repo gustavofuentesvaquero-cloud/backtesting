@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "instruments": [
+    {
+      "id": "GOLD",
+      "asset_class": "equity",
+      "venue": "NYSE",
+      "provider_symbols": [
+        {
+          "provider_id": "IBKR",
+          "symbol": "GOLD"
+        },
+        {
+          "provider_id": "YFINANCE",
+          "symbol": "GOLD"
+        }
+      ],
+      "valid_from": "2020-01-01",
+      "valid_to": null,
+      "calendar_id": "NYSE-EQUITY-REGULAR",
+      "price_tick": "0.01",
+      "price_precision": 2,
+      "quantity_unit": "share",
+      "quantity_precision": 0,
+      "minimum_quantity": "1",
+      "quantity_increment": "1",
+      "quote_currency": "USD",
+      "valuation_model": "equity_shares",
+      "provenance": {
+        "status": "verified",
+        "sources": [
+          "https://www.nyse.com/quote/XNYS:GOLD"
+        ],
+        "notes": "Barrick Gold Corporation (NYSE: GOLD). Major gold and copper producer."
+      },
+      "historical_price_policy": {
+        "price_basis": "split_adjusted",
+        "corporate_action_events": [
+          "split",
+          "dividend"
+        ]
+      }
+    },
+    {
+      "id": "NEM",
+      "asset_class": "equity",
+      "venue": "NYSE",
+      "provider_symbols": [
+        {
+          "provider_id": "IBKR",
+          "symbol": "NEM"
+        },
+        {
+          "provider_id": "YFINANCE",
+          "symbol": "NEM"
+        }
+      ],
+      "valid_from": "2020-01-01",
+      "valid_to": null,
+      "calendar_id": "NYSE-EQUITY-REGULAR",
+      "price_tick": "0.01",
+      "price_precision": 2,
+      "quantity_unit": "share",
+      "quantity_precision": 0,
+      "minimum_quantity": "1",
+      "quantity_increment": "1",
+      "quote_currency": "USD",
+      "valuation_model": "equity_shares",
+      "provenance": {
+        "status": "verified",
+        "sources": [
+          "https://www.nyse.com/quote/XNYS:NEM"
+        ],
+        "notes": "Newmont Corporation (NYSE: NEM). World's largest gold mining company."
+      },
+      "historical_price_policy": {
+        "price_basis": "split_adjusted",
+        "corporate_action_events": [
+          "split",
+          "dividend"
+        ]
+      }
+    },
+    {
+      "id": "BE",
+      "asset_class": "equity",
+      "venue": "NYSE",
+      "provider_symbols": [
+        {
+          "provider_id": "IBKR",
+          "symbol": "BE"
+        },
+        {
+          "provider_id": "YFINANCE",
+          "symbol": "BE"
+        }
+      ],
+      "valid_from": "2020-01-01",
+      "valid_to": null,
+      "calendar_id": "NYSE-EQUITY-REGULAR",
+      "price_tick": "0.01",
+      "price_precision": 2,
+      "quantity_unit": "share",
+      "quantity_precision": 0,
+      "minimum_quantity": "1",
+      "quantity_increment": "1",
+      "quote_currency": "USD",
+      "valuation_model": "equity_shares",
+      "provenance": {
+        "status": "verified",
+        "sources": [
+          "https://www.nyse.com/quote/XNYS:BE"
+        ],
+        "notes": "Bloom Energy Corporation (NYSE: BE). Solid oxide fuel cell energy technology."
+      },
+      "historical_price_policy": {
+        "price_basis": "split_adjusted",
+        "corporate_action_events": [
+          "split",
+          "dividend"
+        ]
+      }
+    }
+  ],
+  "calendars": [
+    {
+      "id": "NYSE-EQUITY-REGULAR",
+      "timezone": "America/New_York",
+      "weekly_sessions": [
+        {
+          "start_weekday": 1,
+          "open_time": "09:30",
+          "close_time": "16:00",
+          "close_day_offset": 0,
+          "kind": "regular"
+        },
+        {
+          "start_weekday": 2,
+          "open_time": "09:30",
+          "close_time": "16:00",
+          "close_day_offset": 0,
+          "kind": "regular"
+        },
+        {
+          "start_weekday": 3,
+          "open_time": "09:30",
+          "close_time": "16:00",
+          "close_day_offset": 0,
+          "kind": "regular"
+        },
+        {
+          "start_weekday": 4,
+          "open_time": "09:30",
+          "close_time": "16:00",
+          "close_day_offset": 0,
+          "kind": "regular"
+        },
+        {
+          "start_weekday": 5,
+          "open_time": "09:30",
+          "close_time": "16:00",
+          "close_day_offset": 0,
+          "kind": "regular"
+        }
+      ],
+      "date_overrides": []
+    }
+  ],
+  "continuous_futures": []
+}
