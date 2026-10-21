@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 
 from scripts.data_baseline import inspect_bars
+from market_catalog.historical_quality import assess_daily_bars, validate_daily_bars
 
 ROOT = Path(__file__).resolve().parents[1]
 DATASET_ID = "nyse-equities-2024-v1"
@@ -83,29 +84,20 @@ def normalize(raw: dict, symbol: str) -> pd.DataFrame:
     for key, expected in identity.items():
         if meta.get(key) != expected:
             raise ValueError(f"{symbol}: identity mismatch for {key}: {meta.get(key)!r}")
-    timestamps = pd.to_datetime(result["timestamp"], unit="s", utc=True)
-    local = timestamps.tz_convert(CALENDAR["timezone"])
-    days = list(local.strftime("%Y-%m-%d"))
-    expected_days = sessions()
-    if days != expected_days:
-        missing = sorted(set(expected_days) - set(days))
-        extra = sorted(set(days) - set(expected_days))
-        raise ValueError(f"{symbol}: session mismatch (missing={missing}, extra={extra}); duplicates/order also rejected")
-    if set(local.strftime("%H:%M:%S")) != {"09:30:00"}:
-        raise ValueError(f"{symbol}: unexpected source session timestamp")
+    timestamps = pd.to_datetime(result["timestamp"], unit="s", utc=True, errors="coerce")
     quote = result["indicators"]["quote"][0]
     frame = pd.DataFrame({key: quote[key] for key in ("open", "high", "low", "close", "volume")})
-    if len(frame) != len(days):
+    if len(frame) != len(timestamps):
         raise ValueError(f"{symbol}: inconsistent quote lengths")
-    frame = frame.astype(float)
-    prices = frame[["open", "high", "low", "close"]]
-    if not np.isfinite(frame.to_numpy()).all() or (prices <= 0).any().any() or (frame.volume < 0).any():
-        raise ValueError(f"{symbol}: nonfinite/nonpositive prices or invalid volume")
-    if (frame.volume != np.floor(frame.volume)).any():
-        raise ValueError(f"{symbol}: fractional share volume")
-    if ((frame.low > prices[["open", "close"]].min(axis=1) + 1e-8) |
-        (frame.high < prices[["open", "close"]].max(axis=1) - 1e-8) | (frame.low > frame.high)).any():
-        raise ValueError(f"{symbol}: inconsistent OHLC")
+    frame["date"] = timestamps
+    frame["instrument_id"] = symbol
+    validate_daily_bars(frame, symbol, CALENDAR, "2024-01-01", "2024-12-31")
+    local = timestamps.tz_convert(CALENDAR["timezone"])
+    days = list(local.strftime("%Y-%m-%d"))
+    if set(local.strftime("%H:%M:%S")) != {"09:30:00"}:
+        raise ValueError(f"{symbol}: unexpected source session timestamp")
+    for key in ("open", "high", "low", "close", "volume"):
+        frame[key] = frame[key].astype(float)
     adjusted = np.asarray(result["indicators"]["adjclose"][0]["adjclose"], dtype=float)
     if len(adjusted) != len(days) or not np.isfinite(adjusted).all() or (adjusted <= 0).any():
         raise ValueError(f"{symbol}: invalid adjusted close")
@@ -259,6 +251,27 @@ def verify(target: Path = DEFAULT_TARGET) -> dict:
     return manifest
 
 
+def dataset_quality_report(target: Path = DEFAULT_TARGET) -> dict:
+    """Keep per-instrument diagnostics even when frozen integrity verification fails."""
+    instruments = {}
+    for symbol in SYMBOLS:
+        try:
+            with duckdb.connect(":memory:") as con:
+                frame = con.execute("SELECT * FROM read_parquet(?)", [str(target / f"{symbol}_1d.parquet")]).df()
+            instruments[symbol] = assess_daily_bars(frame, symbol, CALENDAR, "2024-01-01", "2024-12-31")
+        except (OSError, ValueError, TypeError, duckdb.Error) as exc:
+            instruments[symbol] = {"successful": False, "read_error": str(exc)}
+    integrity_error = None
+    try:
+        verify(target)
+    except (OSError, ValueError, KeyError, TypeError, AssertionError, duckdb.Error) as exc:
+        integrity_error = str(exc)
+    return {"dataset_id": DATASET_ID, "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+            "calendar_source": CALENDAR["source"], "integrity_error": integrity_error,
+            "successful": integrity_error is None and all(x["successful"] for x in instruments.values()),
+            "instruments": instruments}
+
+
 def dataset_metadata(target: Path = DEFAULT_TARGET) -> dict:
     """Export an explicit provenance contract without changing the frozen baseline."""
     manifest = verify(target)
@@ -299,12 +312,21 @@ def main(argv=None) -> int:
     action.add_argument("--download", action="store_true", help="network required; refuses existing downloads")
     action.add_argument("--freeze", action="store_true", help="create from downloads; refuses existing target")
     action.add_argument("--export-metadata", type=Path, metavar="FILE", help="write a derived provenance summary")
+    action.add_argument("--quality-report", type=Path, metavar="FILE", help="write diagnostics, also on failure")
     action.add_argument("--check-metadata", type=Path, metavar="FILE", help="verify a saved provenance summary")
     parser.add_argument("--downloads", type=Path, default=DEFAULT_DOWNLOADS)
     parser.add_argument("--target", type=Path, default=DEFAULT_TARGET)
     args = parser.parse_args(argv)
     try:
-        if args.export_metadata:
+        if args.quality_report:
+            if args.quality_report.resolve().is_relative_to(args.target.resolve()):
+                raise ValueError("Quality report must stay outside the frozen dataset")
+            report = dataset_quality_report(args.target)
+            args.quality_report.parent.mkdir(parents=True, exist_ok=True)
+            write_json(args.quality_report, report)
+            print(f"Daily bar quality {'passed' if report['successful'] else 'failed'}; report: {args.quality_report}")
+            return 0 if report["successful"] else 1
+        elif args.export_metadata:
             if args.export_metadata.resolve().is_relative_to(args.target.resolve()):
                 raise ValueError("Metadata export must stay outside the frozen dataset")
             metadata = dataset_metadata(args.target)

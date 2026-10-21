@@ -101,3 +101,33 @@ La comprobación acredita procedencia declarada, identidad, integridad, transfor
 Los cinco Parquet de `tests/fixtures/historical` siguen siendo regresiones heredadas con procedencia y ajustes desconocidos. No se han renombrado como datos verificados. Tampoco se modificaron `data/historical`, el catálogo operativo o el diario Excel. Antes de comparar rendimientos totales queda por implementar y conciliar en el motor el tratamiento de efectivo por dividendos y la contabilidad prevista en el plan.
 
 La ampliación de metadatos añade una prueba unitaria que elimina cada uno de los ocho campos y altera la fecha de descarga para comprobar su rechazo. La referencia actual es de **132 unitarias y 14 históricas, 146 casos correctos**, registrada en `artifacts/preparation/equity-metadata-tests.json`. La integración compara también el resumen guardado con los originales y el manifiesto.
+
+## Diagnóstico de calidad y sesiones
+
+El validador `market_catalog.historical_quality.validate_daily_bars` comprueba una serie diaria contra el periodo inclusivo y el calendario revisado. Se aplica durante la normalización de las descargas, antes de congelar o reconstruir barras. El informe del conjunto vuelve a inspeccionar los Parquet y comprueba además los hashes y la igualdad con los originales.
+
+```console
+python -m scripts.equity_dataset --quality-report artifacts/daily-quality.json
+```
+
+El comando conserva el JSON también si hay errores y devuelve código 1 cuando el conjunto no es válido. Los trabajos históricos de GitHub Actions lo ejecutan y publican el informe como artefacto incluso si fallan. Se rechaza guardar el informe dentro del conjunto congelado.
+
+| Control | Diagnóstico |
+|---|---|
+| Fechas válidas, únicas y ordenadas | Fechas no interpretables, duplicados exactos, sesiones locales duplicadas y retrocesos, con filas afectadas |
+| Precios finitos y positivos | NaN, infinito, nulos y precios no positivos |
+| Coherencia OHLC | Low no puede superar Open/Close ni High; High debe cubrir Open/Close. Tolerancia relativa/absoluta de 1e-10 únicamente para ruido de coma flotante |
+| Volumen de acciones | Finito, no negativo e integral; cero permitido, listado expresamente |
+| Instrumento | Identificador incorrecto o ausente |
+| Sesiones esperadas | Fechas ausentes y fechas adicionales separadas de festivos y fines de semana |
+| Integridad del conjunto | Archivo ausente, hash incorrecto o diferencia respecto a la respuesta del proveedor |
+
+`checks` contiene los conteos de fallos e `invalid_rows_zero_based` las posiciones afectadas, contando desde cero y conservando el orden original. No se ordena, rellena, elimina ni interpola ninguna barra para ocultar errores.
+
+`sessions.missing` contiene solo jornadas en que el calendario esperaba negociación pero no hay barra. `sessions.market_closed` lista aparte los cierres confirmados, con motivo `weekend` o `exchange_holiday`. `sessions.unexpected` detecta, entre otros errores, una barra fechada en un festivo. `sessions.early_closes` identifica sesiones reducidas: siguen exigiendo una barra y no son cierres de día completo.
+
+Por ejemplo, entre el 1 y el 7 de enero de 2024 se esperan cuatro barras, del 2 al 5. El 1 es festivo y el 6–7 son fin de semana. Si falta el 3, se registra una sesión ausente y tres días de cierre; no se convierte la ausencia del 3 en un festivo ni se crean barras para los días cerrados. El volumen cero por sí solo tampoco demuestra una suspensión o una pérdida de datos. La causa de una ausencia se conserva como desconocida hasta disponer de otra evidencia.
+
+En BE y NEM durante 2024 hay 252 sesiones por acción, 114 fechas de cierre previsto y tres sesiones reducidas. El conjunto pasa todos los controles sin sesiones ausentes ni adicionales. El calendario revisado cubre 2024; el validador rechaza solicitudes de otro año hasta aportar un calendario correspondiente. Esta validación no certifica todavía las series operativas heredadas ni los futuros.
+
+Ocho pruebas sintéticas adicionales cubren ausencia frente a cierre, barras en festivos, duplicados y desorden, valores no finitos y nulos de pandas, OHLCV inválido, cero de volumen, cierres anticipados, periodo fuera del calendario y conservación de diagnósticos al fallar el comando. La referencia pasa **140 unitarias y 14 históricas: 154 casos**. El informe local está en `artifacts/preparation/historical-quality-tests.json`; el control previo al commit vuelve a ejecutar la suite sobre los archivos preparados.

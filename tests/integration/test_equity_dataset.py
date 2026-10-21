@@ -4,7 +4,7 @@ import unittest
 
 import duckdb
 
-from scripts.equity_dataset import DEFAULT_TARGET, verify, verify_metadata
+from scripts.equity_dataset import DEFAULT_TARGET, verify, verify_metadata, dataset_quality_report
 
 
 class FrozenEquityDatasetTests(unittest.TestCase):
@@ -12,6 +12,13 @@ class FrozenEquityDatasetTests(unittest.TestCase):
         manifest = verify()
         metadata = verify_metadata()
         self.assertEqual({i["instrument_id"] for i in metadata["instruments"]}, {"BE", "NEM"})
+        report = dataset_quality_report()
+        self.assertTrue(report["successful"])
+        for item in report["instruments"].values():
+            self.assertEqual(item["sessions"]["expected_count"], 252)
+            self.assertEqual(item["sessions"]["missing"], [])
+            self.assertEqual(len(item["sessions"]["market_closed"]), 114)
+            self.assertEqual(len(item["sessions"]["early_closes"]), 3)
         self.assertEqual(manifest["instruments"]["BE"]["name"], "Bloom Energy Corporation")
         self.assertEqual(manifest["instruments"]["NEM"]["name"], "Newmont Corporation")
         self.assertEqual(manifest["expected_sessions_per_instrument"], 252)

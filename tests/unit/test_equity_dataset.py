@@ -51,6 +51,10 @@ class EquityDatasetTests(unittest.TestCase):
                 stamps = raw["chart"]["result"][0]["timestamp"]
                 if mode == "missing":
                     stamps.pop()
+                    indicators = raw["chart"]["result"][0]["indicators"]
+                    for values in indicators["quote"][0].values():
+                        values.pop()
+                    indicators["adjclose"][0]["adjclose"].pop()
                 elif mode == "duplicate":
                     stamps[1] = stamps[0]
                 elif mode == "extra":
