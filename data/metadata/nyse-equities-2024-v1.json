@@ -1,0 +1,103 @@
+{
+  "format_version": 1,
+  "dataset_id": "nyse-equities-2024-v1",
+  "frozen_manifest_sha256": "4f671af5a25a97f942fc03e540353dfffecdc5eeb7de923c9341e0cf051e6a0e",
+  "instruments": [
+    {
+      "instrument_id": "BE",
+      "provider_symbol": "BE",
+      "provenance": {
+        "provider": "Yahoo Finance chart v8",
+        "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BE?period1=1704067200&period2=1735689600&interval=1d&events=div%2Csplits&includeAdjustedClose=true",
+        "identity_sources": [
+          "https://www.sec.gov/Archives/edgar/data/1664703/000162828025008747/be-20241231.htm"
+        ],
+        "issuer_name": "Bloom Energy Corporation",
+        "cik": "0001664703",
+        "venue": "XNYS",
+        "currency": "USD"
+      },
+      "dates": {
+        "requested_period": {
+          "start_inclusive": "2024-01-01",
+          "end_exclusive": "2025-01-01"
+        },
+        "first_session": "2024-01-02",
+        "last_session": "2024-12-31",
+        "first_bar_utc": "2024-01-02T21:00:00+00:00",
+        "last_bar_utc": "2024-12-31T21:00:00+00:00",
+        "rows": 252,
+        "interval": "1d"
+      },
+      "timezone": {
+        "sessions": "America/New_York",
+        "bar_timestamps": "UTC"
+      },
+      "downloaded_at_utc": "2026-10-21T12:23:00.521028+00:00",
+      "adjustment_policy": {
+        "ohlc": "Yahoo quote OHLC, split-adjusted by provider; no dividend adjustment applied by this pipeline",
+        "adjusted_close": "Yahoo adjclose retained for audit only; never substituted for close",
+        "dividends": "USD per share on provider ex-date; preserved, not credited by this pipeline",
+        "splits": "No splits reported in this sample; reject a source that reports any, pending explicit handling",
+        "date": "UTC scheduled session close; session_date is the NYSE local trading date",
+        "source_timestamp": "Yahoo daily timestamp must match 09:30 America/New_York",
+        "availability": "Scheduled close is a bar label, not a guarantee of provider publication time; trade no earlier than next session",
+        "missing_sessions": "Reject; do not fill or interpolate",
+        "rounding": "Preserve provider floating point values without rounding"
+      },
+      "checksums": {
+        "algorithm": "SHA-256",
+        "bars": "72f98dcfd536be4b3b7dffc45153167cc25f5194d986e78e41a94149eaf04fa2",
+        "source_response": "23882492e1e29d2f781113590c7f9b7acce3708811ca374fab2f389385cc1259"
+      }
+    },
+    {
+      "instrument_id": "NEM",
+      "provider_symbol": "NEM",
+      "provenance": {
+        "provider": "Yahoo Finance chart v8",
+        "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/NEM?period1=1704067200&period2=1735689600&interval=1d&events=div%2Csplits&includeAdjustedClose=true",
+        "identity_sources": [
+          "https://investors.newmont.com/investors/news-release/news-details/2025/Newmont-Reports-Fourth-Quarter-and-Full-Year-2024-Results-Provides-Full-Year-2025-Guidance/default.aspx"
+        ],
+        "issuer_name": "Newmont Corporation",
+        "cik": "0001164727",
+        "venue": "XNYS",
+        "currency": "USD"
+      },
+      "dates": {
+        "requested_period": {
+          "start_inclusive": "2024-01-01",
+          "end_exclusive": "2025-01-01"
+        },
+        "first_session": "2024-01-02",
+        "last_session": "2024-12-31",
+        "first_bar_utc": "2024-01-02T21:00:00+00:00",
+        "last_bar_utc": "2024-12-31T21:00:00+00:00",
+        "rows": 252,
+        "interval": "1d"
+      },
+      "timezone": {
+        "sessions": "America/New_York",
+        "bar_timestamps": "UTC"
+      },
+      "downloaded_at_utc": "2026-10-21T12:23:00.650681+00:00",
+      "adjustment_policy": {
+        "ohlc": "Yahoo quote OHLC, split-adjusted by provider; no dividend adjustment applied by this pipeline",
+        "adjusted_close": "Yahoo adjclose retained for audit only; never substituted for close",
+        "dividends": "USD per share on provider ex-date; preserved, not credited by this pipeline",
+        "splits": "No splits reported in this sample; reject a source that reports any, pending explicit handling",
+        "date": "UTC scheduled session close; session_date is the NYSE local trading date",
+        "source_timestamp": "Yahoo daily timestamp must match 09:30 America/New_York",
+        "availability": "Scheduled close is a bar label, not a guarantee of provider publication time; trade no earlier than next session",
+        "missing_sessions": "Reject; do not fill or interpolate",
+        "rounding": "Preserve provider floating point values without rounding"
+      },
+      "checksums": {
+        "algorithm": "SHA-256",
+        "bars": "efe9e5e5edc5f82e415b0cf80cd613d49fe80a9529f38e476fc4d77671503bc8",
+        "source_response": "99b7ea0053a397a72fd295b78eae54eeacb4d18aed5c13f878d77a30efe3dec3"
+      }
+    }
+  ]
+}

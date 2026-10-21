@@ -21,6 +21,33 @@ Se comprobaron todas las fechas contra el [calendario oficial NYSE para 2024–2
 
 Para ambas series se verifican fechas únicas y ordenadas, precios finitos y positivos, coherencia OHLC, volumen finito, entero y no negativo e identificador del instrumento. Cada ejecución del verificador vuelve a normalizar las respuestas originales y exige igualdad exacta con todas las columnas de los Parquet. Esto permite comprobar que no se sustituyó el cierre ni se cambió un precio al transformar el archivo; los hashes detectan alteraciones del original.
 
+## Metadatos por instrumento
+
+[`data/metadata/nyse-equities-2024-v1.json`](../data/metadata/nyse-equities-2024-v1.json) reúne los campos en un registro explícito para cada acción:
+
+| Información | Campo JSON |
+|---|---|
+| Procedencia: proveedor, URL de descarga, fuentes de identidad, emisor, CIK, mercado y moneda | `provenance` |
+| Identificador en el catálogo | `instrument_id` |
+| Símbolo del proveedor | `provider_symbol` |
+| Periodo solicitado, primera y última sesión, timestamps de barras, intervalo y filas | `dates` |
+| Zona de las sesiones y de los timestamps | `timezone` |
+| Instante original de descarga en UTC | `downloaded_at_utc` |
+| Política de splits, dividendos, cierre ajustado y redondeo | `adjustment_policy` |
+| Algoritmo SHA-256 y hashes de Parquet y respuesta original | `checksums` |
+
+El documento incluye además el identificador del conjunto y el SHA-256 del manifiesto congelado. Es un resumen derivado: no cambia los archivos originales ni sus hashes, y conserva la fecha real de descarga en vez de sustituirla por la fecha de exportación.
+
+```console
+python -m scripts.equity_dataset --check-metadata data/metadata/nyse-equities-2024-v1.json
+```
+
+La validación reconstruye el resumen desde la fuente congelada y rechaza campos ausentes, valores alterados o metadatos de otro conjunto. Las pruebas históricas hacen esta comprobación automáticamente. Para exportar otra copia revisable fuera de la carpeta congelada:
+
+```console
+python -m scripts.equity_dataset --export-metadata artifacts/equity-metadata.json
+```
+
 ## Fechas, ajustes y eventos
 
 - `session_date` es la fecha local de negociación. `source_timestamp` conserva el timestamp diario original de Yahoo y se exige que corresponda a las 09:30 de Nueva York.
@@ -72,3 +99,5 @@ La suite local tiene **131 unitarias y 14 históricas: 145 casos correctos**. Di
 La comprobación acredita procedencia declarada, identidad, integridad, transformación y completitud de sesiones de este proveedor. No compara todos los precios con un segundo proveedor ni certifica operaciones de bolsa. La muestra es una descarga realizada en 2026, no una captura disponible en tiempo real en 2024; el cierre ajustado puede incorporar eventos posteriores. Los dos instrumentos supervivientes y un año no permiten medir sesgo de supervivencia ni validar una estrategia fuera de muestra.
 
 Los cinco Parquet de `tests/fixtures/historical` siguen siendo regresiones heredadas con procedencia y ajustes desconocidos. No se han renombrado como datos verificados. Tampoco se modificaron `data/historical`, el catálogo operativo o el diario Excel. Antes de comparar rendimientos totales queda por implementar y conciliar en el motor el tratamiento de efectivo por dividendos y la contabilidad prevista en el plan.
+
+La ampliación de metadatos añade una prueba unitaria que elimina cada uno de los ocho campos y altera la fecha de descarga para comprobar su rechazo. La referencia actual es de **132 unitarias y 14 históricas, 146 casos correctos**, registrada en `artifacts/preparation/equity-metadata-tests.json`. La integración compara también el resumen guardado con los originales y el manifiesto.

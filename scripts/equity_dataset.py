@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATASET_ID = "nyse-equities-2024-v1"
 DEFAULT_TARGET = ROOT / "data" / "frozen" / DATASET_ID
 DEFAULT_DOWNLOADS = ROOT / "artifacts" / "downloads" / "nyse-2024-initial"
+DEFAULT_METADATA = ROOT / "data" / "metadata" / f"{DATASET_ID}.json"
 SYMBOLS = ("BE", "NEM")
 IDENTITIES = {
     "BE": {"name": "Bloom Energy Corporation", "cik": "0001664703", "share_class": "Class A common stock",
@@ -258,16 +259,62 @@ def verify(target: Path = DEFAULT_TARGET) -> dict:
     return manifest
 
 
+def dataset_metadata(target: Path = DEFAULT_TARGET) -> dict:
+    """Export an explicit provenance contract without changing the frozen baseline."""
+    manifest = verify(target)
+    records = []
+    for symbol in SYMBOLS:
+        item = manifest["instruments"][symbol]
+        receipt = json.loads((target / "source" / f"{symbol}.receipt.json").read_text(encoding="utf-8"))
+        quality = item["quality"]
+        records.append({
+            "instrument_id": symbol,
+            "provider_symbol": item["provider_symbol"],
+            "provenance": {"provider": item["provider"], "source_url": receipt["requested_url"],
+                           "identity_sources": item["sources"], "issuer_name": item["name"],
+                           "cik": item["cik"], "venue": item["venue"], "currency": item["currency"]},
+            "dates": {"requested_period": manifest["period"], "first_session": sessions()[0],
+                      "last_session": sessions()[-1], "first_bar_utc": quality["first_date"],
+                      "last_bar_utc": quality["last_date"], "rows": quality["rows"], "interval": "1d"},
+            "timezone": {"sessions": CALENDAR["timezone"], "bar_timestamps": "UTC"},
+            "downloaded_at_utc": item["retrieved_at_utc"],
+            "adjustment_policy": manifest["policy"],
+            "checksums": {"algorithm": "SHA-256", "bars": quality["sha256"],
+                          "source_response": manifest["files"][f"source/{symbol}.json"]},
+        })
+    return {"format_version": 1, "dataset_id": manifest["dataset_id"],
+            "frozen_manifest_sha256": sha256(target / "manifest.json"), "instruments": records}
+
+
+def verify_metadata(path: Path = DEFAULT_METADATA, target: Path = DEFAULT_TARGET) -> dict:
+    actual = json.loads(path.read_text(encoding="utf-8"))
+    if actual != dataset_metadata(target):
+        raise ValueError("Dataset metadata is missing, altered or inconsistent with the frozen source")
+    return actual
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--download", action="store_true", help="network required; refuses existing downloads")
     action.add_argument("--freeze", action="store_true", help="create from downloads; refuses existing target")
+    action.add_argument("--export-metadata", type=Path, metavar="FILE", help="write a derived provenance summary")
+    action.add_argument("--check-metadata", type=Path, metavar="FILE", help="verify a saved provenance summary")
     parser.add_argument("--downloads", type=Path, default=DEFAULT_DOWNLOADS)
     parser.add_argument("--target", type=Path, default=DEFAULT_TARGET)
     args = parser.parse_args(argv)
     try:
-        if args.download:
+        if args.export_metadata:
+            if args.export_metadata.resolve().is_relative_to(args.target.resolve()):
+                raise ValueError("Metadata export must stay outside the frozen dataset")
+            metadata = dataset_metadata(args.target)
+            args.export_metadata.parent.mkdir(parents=True, exist_ok=True)
+            write_json(args.export_metadata, metadata)
+            print(f"Saved verified provenance metadata to {args.export_metadata}")
+        elif args.check_metadata:
+            verify_metadata(args.check_metadata, args.target)
+            print(f"Verified provenance metadata: {args.check_metadata}")
+        elif args.download:
             download(args.downloads)
             print(f"Downloaded {len(SYMBOLS)} verified source responses to {args.downloads}")
         else:

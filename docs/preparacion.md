@@ -29,7 +29,7 @@ Se utiliza como raíz del paquete la carpeta superior a `docs`, que contiene `py
 ## Evidencia local
 
 - Antes de separar las pruebas, la suite original ejecutó **113 casos**, todos correctos.
-- La referencia actual ejecuta **131 casos unitarios y 14 históricos**, **145 en total**, sin errores ni casos omitidos. Incluye cuatro casos de aislamiento, tres del control de commits preparados y doce del conjunto inicial identificado.
+- La referencia actual ejecuta **132 casos unitarios y 14 históricos**, **146 en total**, sin errores ni casos omitidos. Incluye cuatro casos de aislamiento, tres del control de commits preparados y trece del conjunto inicial identificado y sus metadatos.
 - La instalación del wheel se comprobó en otro entorno virtual sin acceso al código fuente por `PYTHONPATH`, usando dependencias locales y sin descargar cotizaciones. Esta comprobación motivó corregir la búsqueda del esquema de despliegue en una instalación normal.
 - Los cinco históricos congelados pasan los controles estructurales de fechas, OHLC, volumen e identificador. Se registra una tolerancia numérica de `1e-10` absoluta y relativa para diferencias de coma flotante en los límites OHLC.
 - `pip check` no detecta dependencias incompatibles. Se verificaron en entornos limpios los 18 paquetes del núcleo y los 35 de la variante de descarga, comprobando cada versión frente a su lock. Los paquetes compartidos tienen versiones idénticas en ambos archivos. yfinance se importa correctamente; no se ha comprobado su servicio remoto.

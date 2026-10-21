@@ -59,6 +59,7 @@ Los siguientes comandos suponen que `python` es el del entorno virtual; en Windo
 python -m scripts.check --suite unit
 python -m scripts.data_baseline
 python -m scripts.equity_dataset
+python -m scripts.equity_dataset --check-metadata data/metadata/nyse-equities-2024-v1.json
 python -m scripts.check --suite historical
 python -m scripts.check --suite all --report artifacts/preparation/checks.json
 ```

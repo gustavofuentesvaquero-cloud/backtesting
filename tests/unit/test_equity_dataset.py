@@ -12,7 +12,7 @@ import pandas as pd
 from scripts.data_baseline import inspect_bars
 from scripts.equity_dataset import (
     CALENDAR, IDENTITIES, SYMBOLS, freeze, normalize, sessions, sha256, source_url,
-    validate_catalog, verify, write_json,
+    validate_catalog, verify, write_json, dataset_metadata, verify_metadata,
 )
 
 
@@ -176,3 +176,28 @@ class EquityDatasetTests(unittest.TestCase):
                 write_json(path, changed)
                 with self.assertRaises(ValueError):
                     freeze(source, root / "frozen", catalog)
+
+    def test_saved_metadata_requires_every_field_and_original_values(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, catalog = self.make_inputs(root)
+            target = root / "frozen"
+            freeze(source, target, catalog)
+            metadata = dataset_metadata(target)
+            path = root / "metadata.json"
+            write_json(path, metadata)
+            self.assertEqual(verify_metadata(path, target), metadata)
+            record = metadata["instruments"][0]
+            self.assertEqual(record["timezone"], {"sessions": "America/New_York", "bar_timestamps": "UTC"})
+            for field in ("instrument_id", "provider_symbol", "provenance", "dates", "timezone",
+                          "downloaded_at_utc", "adjustment_policy", "checksums"):
+                changed = deepcopy(metadata)
+                del changed["instruments"][0][field]
+                write_json(path, changed)
+                with self.subTest(missing=field), self.assertRaisesRegex(ValueError, "metadata"):
+                    verify_metadata(path, target)
+            changed = deepcopy(metadata)
+            changed["instruments"][0]["downloaded_at_utc"] = "2025-01-01T00:00:00+00:00"
+            write_json(path, changed)
+            with self.assertRaisesRegex(ValueError, "metadata"):
+                verify_metadata(path, target)
