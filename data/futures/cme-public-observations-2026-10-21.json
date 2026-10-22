@@ -23,11 +23,13 @@
     "date_fields_described_by_cme": ["First Position Date", "Last Position Date", "First Notice Date", "Last Notice Date", "First Delivery Date", "Last Delivery Date"],
     "schedule_api_documentation_url": "https://cmegroupclientsite.atlassian.net/wiki/spaces/EPICSANDBOX/pages/457217339",
     "schedule_api_documentation_scope": "Globex market-state trading schedules; one year historical and one year forward according to the CME client-system document",
+    "reference_api_v3_authentication": "OAuth; documented as restricted client access",
+    "reference_api_v3_documentation_url": "https://cmegroupclientsite.atlassian.net/wiki/spaces/EPICSANDBOX/pages/457215780",
     "anonymous_api_probe": {"url": "https://refdata.api.cmegroup.com/refdata/v3/tradingSchedules?page=0&size=1", "http_status": 401, "credentials_used": false, "observed_on": "2026-10-22"},
     "public_weekly_schedule_directory": "https://www.cmegroup.com/ftp/SBEFix/Production/",
     "public_weekly_schedule_filename": "TradingSessionList.dat",
     "weekly_schedule_download_status_in_research_session": 403,
-    "resolution": "Use the public interactive expiration calendar for delivery event dates; retain no broker cutoff inferred from exchange schedules. A local, source-identified per-session calendar is still required before validating bar omissions or roll sessions."
+    "resolution": "Use the public interactive expiration calendar or public clearing advisories for delivery event dates. The credentialed reference API is outside the user's public-source scope. Retain no broker cutoff inferred from exchange schedules. A local, source-identified per-session calendar is still required before validating bar omissions or roll sessions."
   },
   "rows": [
     {
