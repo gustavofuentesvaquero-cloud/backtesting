@@ -14,8 +14,23 @@
     "https://www.cmegroup.com/trading/metals/files/metals-prod-guide-2024.pdf",
     "https://www.cmegroup.com/tools-information/quikstrike/product-expiration-browser-metals.html",
     "https://www.cmegroup.com/trading/metals/files/precious-metals-delivery-process.pdf",
-    "https://www.cmegroup.com/trading-hours.html"
+    "https://www.cmegroup.com/trading-hours.html",
+    "https://www.cmegroup.com/tools-information/vendorSymbol.html"
   ],
+  "exchange_product_codes": {
+    "globex": "MGC",
+    "clearport": "MGC",
+    "clearing": "MGC",
+    "tas": "MGT",
+    "provider_root_symbols_from_cme_vendor_table": {
+      "CQG": "MGC",
+      "Fidessa (ION)": "MGC",
+      "FIS Global": "MGC",
+      "Trading Technologies": "MGC",
+      "Vela Trading Systems": "MGC"
+    },
+    "scope": "product/root codes only; does not verify a vendor's individual expiry identifier or historical bar attribution"
+  },
   "last_trade_rule": "Third last exchange business day of delivery month",
   "contract_month_codes": {
     "02": "G",

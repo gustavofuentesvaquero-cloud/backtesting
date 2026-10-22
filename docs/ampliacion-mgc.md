@@ -15,6 +15,10 @@ Revisión: 22 de octubre de 2026. La especificación para ampliar la investigaci
 
 Fuentes primarias: [COMEX, capítulo 120](https://www.cmegroup.com/content/dam/cmegroup/rulebook/COMEX/1a/120.pdf), [guía de productos de metales CME](https://www.cmegroup.com/trading/metals/files/metals-prod-guide-2024.pdf) y [ficha de Micro Gold](https://www.cmegroup.com/markets/metals/precious/e-micro-gold.contractSpecs.html). Los meses cotizados en cada fecha deben contrastarse con la cadena de la bolsa y el proveedor; el código de mes no acredita por sí solo que exista una cotización disponible.
 
+## Identificadores de proveedor
+
+La ficha CME identifica MGC como código de producto para Globex, ClearPort y clearing; MGT se usa para TAS. La [tabla oficial de símbolos de proveedores CME](https://www.cmegroup.com/tools-information/vendorSymbol.html) muestra el root `MGC` para distribuidores como CQG, Fidessa/ION, FIS Global, Trading Technologies y Vela. Son códigos de producto, no el identificador completo de un vencimiento ni una prueba del histórico servido por esos proveedores. Para esta investigación se observaron los identificadores específicos Yahoo `MGCV26.CMX`, `MGCZ26.CMX` y `MGCG27.CMX` en los metadatos de sus respuestas. Por eso el catálogo conserva por separado el root CME, el símbolo visible CME y la clave del proveedor; esta última sigue siendo elegible solo para investigación mientras no se certifiquen su semántica y cobertura histórica.
+
 Se consultó el [calendario público CME QuikStrike](https://www.cmegroup.com/tools-information/quikstrike/product-expiration-browser-metals.html), filtrando Micro Gold Futures, COMEX, producto 775. Mostró estos vencimientos, coincidentes con las derivaciones anteriores:
 
 | Instrumento | Símbolo CME mostrado | Símbolo Yahoo consultado | Expiración CME observada |
