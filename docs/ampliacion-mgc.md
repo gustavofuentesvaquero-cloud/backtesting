@@ -68,6 +68,8 @@ La suite histórica reconstruye el diagnóstico desde los originales y verifica 
 
 Para la ampliación, cada barra de ejecución debe identificar contrato, mes, proveedor y procedencia. El P&L y la variación de margen se calculan con los precios raw del contrato efectivamente mantenido y multiplicador 10. El salto de precio entre dos vencimientos no es por sí solo una ganancia o pérdida de la posición: el cambio exige dos operaciones registradas.
 
+La muestra pública ilustra la diferencia entre niveles de contratos: el 21/09/2026 Yahoo mostraba cierre 4350,20 para MGCV26.CMX y 4383,90 para MGCZ26.CMX; ambos tienen la misma fecha de etiqueta y metadatos de contrato distintos. La diferencia observada es 33,70 USD/onza, o 337 USD si se multiplica por las 10 onzas del contrato. Es una diferencia entre cierres diarios de contratos con meses distintos, no una cotización simultánea garantizada, precio de settlement, spread ejecutable ni P&L. Los valores originales, identificadores de petición y checksums están en `data/research/mgc-public-2026-10-22/`; la atribución por barra y los límites temporales del proveedor aún no se certifican.
+
 La primera serie continua de análisis se concatenará **sin ajuste**, guardando contrato por barra y un manifiesto de roll. Solo será una vista de referencia. Si posteriormente se construye una serie ajustada por diferencias o ratios para indicadores, se guardará aparte, con factores y versión; sus niveles no se usarán para fills, stops, liquidación diaria ni atribución de P&L. Una reconstrucción retrospectiva tampoco prueba causalidad de indicadores históricos.
 
 ## Puerta de entrada a los experimentos
