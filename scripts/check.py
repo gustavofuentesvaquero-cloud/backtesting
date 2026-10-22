@@ -67,7 +67,7 @@ def run_checks(suite: str, report_path: Path | None = None) -> bool:
         reports.append({
             "suite": group,
             "test_directory": str(directory.relative_to(ROOT)),
-            "data_policy": "synthetic and temporary stores" if group == "unit" else "verified frozen historical stores",
+            "data_policy": "synthetic and temporary stores" if group == "unit" else "frozen regression/equity inputs and quarantined research evidence",
             "tests": result.testsRun,
             "failures": [{"test": str(test), "traceback": trace} for test, trace in result.failures],
             "errors": [{"test": str(test), "traceback": trace} for test, trace in result.errors],

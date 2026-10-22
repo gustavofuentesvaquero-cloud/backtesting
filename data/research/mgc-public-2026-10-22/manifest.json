@@ -1,0 +1,17 @@
+{
+  "format_version": 1,
+  "usage": "quarantined public research evidence; not an execution dataset",
+  "files": {
+    "audit.json": "50c16fb033d18d49f9e97ecbdff7db1e81714df0a65f022830fb678da40be386",
+    "MGCG26.CMX.json": "f0b5f9feeac9f1fc93c31b1edc03fbc1fda4acb3ec5e233ebb39d6f8b66e1769",
+    "MGCG26.CMX.receipt.json": "f259f229c283b551e60c303d95db2b1a5b9917912ca92510d24a574e6b9f6d99",
+    "MGCG27.CMX.json": "3867752e8bd7d27b4f130224275825076216a28e05543e955b57f96a6c5d2f74",
+    "MGCG27.CMX.receipt.json": "926aaaa9859f3f16e6192825d104b43047691700c45e68f74df986d2c0aa28ed",
+    "MGCM26.CMX.json": "f0b5f9feeac9f1fc93c31b1edc03fbc1fda4acb3ec5e233ebb39d6f8b66e1769",
+    "MGCM26.CMX.receipt.json": "03e5d7a414c55a1b2d3693c34ae614064c99aa60b286633b973cb8ef9d1c79c7",
+    "MGCV26.CMX.json": "fbb8ae50d548e828fbaa45ad109d8cc41142d2f509b68ca19e2fbd1051a9daa1",
+    "MGCV26.CMX.receipt.json": "6f1349233e32898aacb3b9f4ed6baa2bd14839a7c619e0837398b5ab7ca74b49",
+    "MGCZ26.CMX.json": "fdef930bc7e52478d9aeb4f1b9f60e19a428a0f4248c4e67954857e7410fc923",
+    "MGCZ26.CMX.receipt.json": "c04d6f5f2169ce35c066d75e624db1659156df1b139c7968f7dd808be6102dbb"
+  }
+}

@@ -7,6 +7,7 @@
 | `data/frozen/nyse-equities-2024-v1` | Muestra aceptada BE/NEM, originales auditables y Parquet | El almacén rechaza escrituras y descargas; el creador rechaza sobrescribir |
 | `tests/fixtures/historical` | Cinco regresiones heredadas con procedencia no verificada | El almacén rechaza escrituras y descargas |
 | `data/metadata` | Resúmenes derivados de las fuentes aceptadas | Regenerables y contrastados con el manifiesto original |
+| `data/research/mgc-public-2026-10-22` | Evidencia pública MGC pendiente de calendario y semántica de precios | Copia con manifiesto protegida por la API; no admitida para ejecución |
 | `artifacts/<experimento>` | Configuración e informes de una ejecución | Separados de los datos de entrada |
 
 Los originales aceptados dentro de `source/` son copias para auditoría, no una caché que se actualice. Los experimentos verifican su conjunto y proporcionan explícitamente su ruta a `MarketDataStore`. Una actualización del diario en la caché no modifica el conjunto congelado.
@@ -26,6 +27,6 @@ python -m scripts.equity_dataset
 python -m scripts.equity_dataset --check-metadata data/metadata/nyse-equities-2024-v1.json
 ```
 
-`tests/unit/test_frozen_storage.py` utiliza solo escenarios temporales. Comprueba lectura permitida y escritura rechazada, bloqueo de nuevas descargas dentro del conjunto, actualización independiente de la caché y detección de un manifiesto creado después de abrir el almacén. Los dos casos de ubicación ejercitan ambos creadores y prueban que los rechazos no crean carpetas ni alteran el manifiesto anterior. La suite completa consta de 157 unitarias y 14 históricas, 171 casos correctos.
+`tests/unit/test_frozen_storage.py` utiliza solo escenarios temporales. Comprueba lectura permitida y escritura rechazada, bloqueo de nuevas descargas dentro del conjunto, actualización independiente de la caché y detección de un manifiesto creado después de abrir el almacén. Los dos casos de ubicación ejercitan ambos creadores y prueban que los rechazos no crean carpetas ni alteran el manifiesto anterior. En esa entrega se verificaron 157 unitarias y 14 históricas. La ampliación pública MGC eleva la referencia actual a 168 unitarias y 15 históricas, 183 casos correctos; su evidencia en `data/research/` sigue separada de los datos admitidos para ejecución.
 
 Las fuentes y los destinos predeterminados siguen en carpetas distintas. La muestra BE/NEM y las regresiones mantienen sus hashes; no se han movido ni regenerado sus archivos para esta entrega. El informe de pruebas y los logs quedan en `artifacts/preparation/data-separation-tests.json` y `data-separation-tests.log`.

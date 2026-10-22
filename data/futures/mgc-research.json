@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "reviewed_on": "2026-10-21",
+  "reviewed_on": "2026-10-22",
   "product_root": "MGC",
   "venue": "COMEX",
   "currency": "USD",
@@ -11,7 +11,8 @@
   "delivery_form": "ACE representing a one-tenth interest in a 100-troy-ounce warrant",
   "sources": [
     "https://www.cmegroup.com/content/dam/cmegroup/rulebook/COMEX/1a/120.pdf",
-    "https://www.cmegroup.com/trading/metals/files/metals-prod-guide-2024.pdf"
+    "https://www.cmegroup.com/trading/metals/files/metals-prod-guide-2024.pdf",
+    "https://www.cmegroup.com/tools-information/quikstrike/product-expiration-browser-metals.html"
   ],
   "last_trade_rule": "Third last exchange business day of delivery month",
   "contract_month_codes": {
@@ -24,6 +25,24 @@
   },
   "candidate_contracts": [
     {
+      "instrument_id": "MGC-2026-10",
+      "contract_month": "2026-10",
+      "display_symbol": "MGCV6",
+      "last_trade_date_derived": "2026-10-28",
+      "first_notice_date": null,
+      "broker_closeout_date": null,
+      "exchange_calendar_verified": false,
+      "provider_security_id": "MGCV26.CMX",
+      "execution_eligible": false,
+      "last_trade_date": "2026-10-28",
+      "last_trade_date_evidence": "cme-public-observations-2026-10-21.json (manual rendered-table transcription; original export pending)",
+      "first_intent_date": null,
+      "provider": "Yahoo Finance",
+      "is_continuous": false,
+      "provider_identity_evidence": "../research/mgc-public-2026-10-22/MGCV26.CMX.json (response metadata)",
+      "provider_bar_semantics_verified": false
+    },
+    {
       "instrument_id": "MGC-2026-12",
       "contract_month": "2026-12",
       "display_symbol": "MGCZ6",
@@ -31,8 +50,15 @@
       "first_notice_date": null,
       "broker_closeout_date": null,
       "exchange_calendar_verified": false,
-      "provider_security_id": null,
-      "execution_eligible": false
+      "provider_security_id": "MGCZ26.CMX",
+      "execution_eligible": false,
+      "last_trade_date": "2026-12-29",
+      "last_trade_date_evidence": "cme-public-observations-2026-10-21.json (manual rendered-table transcription; original export pending)",
+      "first_intent_date": null,
+      "provider": "Yahoo Finance",
+      "is_continuous": false,
+      "provider_identity_evidence": "../research/mgc-public-2026-10-22/MGCZ26.CMX.json (response metadata)",
+      "provider_bar_semantics_verified": false
     },
     {
       "instrument_id": "MGC-2027-02",
@@ -42,19 +68,27 @@
       "first_notice_date": null,
       "broker_closeout_date": null,
       "exchange_calendar_verified": false,
-      "provider_security_id": null,
-      "execution_eligible": false
+      "provider_security_id": "MGCG27.CMX",
+      "execution_eligible": false,
+      "last_trade_date": "2027-02-24",
+      "last_trade_date_evidence": "cme-public-observations-2026-10-21.json (manual rendered-table transcription; original export pending)",
+      "first_intent_date": null,
+      "provider": "Yahoo Finance",
+      "is_continuous": false,
+      "provider_identity_evidence": "../research/mgc-public-2026-10-22/MGCG27.CMX.json (response metadata)",
+      "provider_bar_semantics_verified": false
     }
   ],
   "rollover_policy": {
-    "id": "mgc-calendar-before-delivery-v1",
-    "trigger": "Five reviewed CME trading sessions before the earliest of first_notice_date, last_trade_date, and broker_closeout_date",
+    "id": "mgc-calendar-before-delivery-v2",
+    "trigger": "Five reviewed CME trading sessions before the earliest of first_intent_date, first_notice_date, last_trade_date, and broker_closeout_date",
     "target": "Next eligible listed maturity with verified provider security ID and overlapping raw price observations",
     "execution": "Close old and open new at the scheduled session open; decisions fixed before that open",
     "costs": "Two executions with their own commission, spread and slippage",
     "missing_calendar_or_contract_data": "Reject experiment; do not infer NYSE sessions, notices, provider IDs, prices or volume",
     "continuous_adjustment": "none",
-    "continuous_usage": "research/reference only; fills and PnL require individual contract prices and contract IDs"
+    "continuous_usage": "research/reference only; fills and PnL require individual contract prices and contract IDs",
+    "reason_for_v2": "CME delivery advisories distinguish first intent/position from first notice; the earlier delivery exposure must be considered"
   },
   "legacy_reference": {
     "instrument_id": "MGC",
@@ -62,5 +96,19 @@
     "composition_and_roll_verified": false,
     "tradable_prices": false
   },
-  "implementation_status": "Identification and rollover contract defined; production chain, notice dates, broker cutoff, CME session calendar and contract-level price history still required"
+  "implementation_status": "Three public provider identities and overlapping observed histories archived with checksums; CME expiry dates manually observed. Specific intent/notice dates, session calendar, broker cutoff, provider bar/settlement semantics and validated execution chain remain unresolved",
+  "public_research_evidence": {
+    "path": "../research/mgc-public-2026-10-22",
+    "contracts": 3,
+    "bars_per_contract": 201,
+    "start_label": "2026-01-02",
+    "end_label": "2026-10-20",
+    "execution_eligible": false,
+    "calendar_verified": false,
+    "roll_events_validated": 0,
+    "expired_contract_probes": {
+      "MGCG26.CMX": 404,
+      "MGCM26.CMX": 404
+    }
+  }
 }

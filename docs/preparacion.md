@@ -1,6 +1,6 @@
 # Preparativos implementados
 
-Fecha: 21 de octubre de 2026.
+Fecha: 22 de octubre de 2026.
 
 ## Alcance
 
@@ -29,7 +29,7 @@ Se utiliza como raíz del paquete la carpeta superior a `docs`, que contiene `py
 ## Evidencia local
 
 - Antes de separar las pruebas, la suite original ejecutó **113 casos**, todos correctos.
-- La referencia actual ejecuta **157 casos unitarios y 14 históricos**, **171 en total**, sin errores ni casos omitidos. Incluye cuatro casos de aislamiento, tres del control de commits preparados y veintiún casos del conjunto inicial identificado, sus metadatos y calidad diaria.
+- La referencia actual ejecuta **168 casos unitarios y 15 históricos**, **183 en total**, sin errores ni casos omitidos. Incluye once casos nuevos de validación de adquisiciones públicas MGC y límites de entrega, más una reconstrucción histórica sin red. La muestra MGC se conserva en investigación y no se considera apta para ejecución; véase [alcance y pendientes](ampliacion-mgc.md).
 - La instalación del wheel se comprobó en otro entorno virtual sin acceso al código fuente por `PYTHONPATH`, usando dependencias locales y sin descargar cotizaciones. Esta comprobación motivó corregir la búsqueda del esquema de despliegue en una instalación normal.
 - Los cinco históricos congelados pasan los controles estructurales de fechas, OHLC, volumen e identificador. Se registra una tolerancia numérica de `1e-10` absoluta y relativa para diferencias de coma flotante en los límites OHLC.
 - `pip check` no detecta dependencias incompatibles. Se verificaron en entornos limpios los 18 paquetes del núcleo y los 35 de la variante de descarga, comprobando cada versión frente a su lock. Los paquetes compartidos tienen versiones idénticas en ambos archivos. yfinance se importa correctamente; no se ha comprobado su servicio remoto.

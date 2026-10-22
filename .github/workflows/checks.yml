@@ -43,6 +43,9 @@ jobs:
       - name: Verify identified equity dataset
         if: matrix.suite == 'historical'
         run: python -m scripts.equity_dataset
+      - name: Verify quarantined public MGC evidence
+        if: matrix.suite == 'historical'
+        run: python -m scripts.mgc_public_data verify
       - name: Run selected suite without network
         run: python -m scripts.check --suite ${{ matrix.suite }} --report artifacts/checks.json
       - name: Build and verify installed wheel

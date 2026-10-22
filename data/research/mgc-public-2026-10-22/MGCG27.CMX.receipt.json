@@ -1,0 +1,10 @@
+{
+  "provider": "Yahoo Finance public chart",
+  "symbol": "MGCG27.CMX",
+  "request_url": "https://query1.finance.yahoo.com/v8/finance/chart/MGCG27.CMX?period1=1767225600&period2=1792540800&interval=1d",
+  "requested_start": "2026-01-01",
+  "requested_end_exclusive": "2026-10-21",
+  "downloaded_at_utc": "2026-10-22T07:29:49.170451+00:00",
+  "http_status": 200,
+  "sha256": "3867752e8bd7d27b4f130224275825076216a28e05543e955b57f96a6c5d2f74"
+}

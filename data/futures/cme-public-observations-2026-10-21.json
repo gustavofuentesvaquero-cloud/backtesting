@@ -1,0 +1,61 @@
+{
+  "format_version": 1,
+  "evidence_kind": "manual transcription from rendered public CME QuikStrike Contract Expirations table",
+  "observed_on": "2026-10-21",
+  "source_url": "https://www.cmegroup.com/tools-information/quikstrike/product-expiration-browser-metals.html",
+  "selection": {
+    "product": "Micro Gold Futures",
+    "product_id": "775",
+    "venue": "COMEX",
+    "type": "Future"
+  },
+  "displayed_time_label": "All Times CST",
+  "limitations": [
+    "Transcription is not an original CSV export or archived screenshot",
+    "Export attempt was interrupted; subsequent direct request returned QuikStrike Error HTML, not CSV",
+    "The table does not provide first intent or first notice dates",
+    "No session calendar or provider price attribution is certified by these rows"
+  ],
+  "rows": [
+    {
+      "symbol": "MGCV6",
+      "first_available": "2024-11-27",
+      "expiration_date": "2026-10-28",
+      "expiration_time_as_displayed": "12:30",
+      "settle_date": "2026-10-28"
+    },
+    {
+      "symbol": "MGCZ6",
+      "first_available": "2024-12-30",
+      "expiration_date": "2026-12-29",
+      "expiration_time_as_displayed": "12:30",
+      "settle_date": "2026-12-29"
+    },
+    {
+      "symbol": "MGCG7",
+      "first_available": "2025-03-28",
+      "expiration_date": "2027-02-24",
+      "expiration_time_as_displayed": "12:30",
+      "settle_date": "2027-02-24"
+    }
+  ],
+  "past_delivery_advisories": [
+    {
+      "source_url": "https://www.cmegroup.com/content/dam/cmegroup/notices/clearing/2026/01/chadv26-033.pdf",
+      "notice_id": "26-033",
+      "contract_month": "2026-02",
+      "first_intent_date": "2026-01-29",
+      "first_notice_date": "2026-01-30",
+      "last_trade_date": "2026-02-25"
+    },
+    {
+      "source_url": "https://www.cmegroup.com/content/dam/cmegroup/notices/clearing/2026/05/chadv26-192.pdf",
+      "notice_id": "26-192",
+      "contract_month": "2026-06",
+      "first_intent_date": "2026-05-28",
+      "first_notice_date": "2026-05-29",
+      "last_trade_date": "2026-06-26"
+    }
+  ],
+  "advisory_evidence_kind": "official PDFs reviewed through web extraction; originals not archived locally because direct download returned HTTP 403"
+}

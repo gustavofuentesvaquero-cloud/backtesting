@@ -15,3 +15,4 @@
 *.xlsx binary
 *.zip binary
 data/frozen/** -text
+data/research/mgc-public-2026-10-22/** -text whitespace=cr-at-eol
