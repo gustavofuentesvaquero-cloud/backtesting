@@ -16,6 +16,19 @@
     "The table does not provide first intent or first notice dates",
     "No session calendar or provider price attribution is certified by these rows"
   ],
+  "follow_up_source_audit": {
+    "expiration_calendar_url": "https://www.cmegroup.com/tools-information/calendars/expiration-calendar.html",
+    "expiration_calendar_description": "Public CME interactive calendar filters product, event type and time frame; the page describes delivery, first/last trade and other event dates",
+    "about_listings_url": "https://www.cmegroup.com/trading/about-listings.html",
+    "date_fields_described_by_cme": ["First Position Date", "Last Position Date", "First Notice Date", "Last Notice Date", "First Delivery Date", "Last Delivery Date"],
+    "schedule_api_documentation_url": "https://cmegroupclientsite.atlassian.net/wiki/spaces/EPICSANDBOX/pages/457217339",
+    "schedule_api_documentation_scope": "Globex market-state trading schedules; one year historical and one year forward according to the CME client-system document",
+    "anonymous_api_probe": {"url": "https://refdata.api.cmegroup.com/refdata/v3/tradingSchedules?page=0&size=1", "http_status": 401, "credentials_used": false, "observed_on": "2026-10-22"},
+    "public_weekly_schedule_directory": "https://www.cmegroup.com/ftp/SBEFix/Production/",
+    "public_weekly_schedule_filename": "TradingSessionList.dat",
+    "weekly_schedule_download_status_in_research_session": 403,
+    "resolution": "Use the public interactive expiration calendar for delivery event dates; retain no broker cutoff inferred from exchange schedules. A local, source-identified per-session calendar is still required before validating bar omissions or roll sessions."
+  },
   "rows": [
     {
       "symbol": "MGCV6",
